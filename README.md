@@ -1,0 +1,1 @@
+# vk_likes_pyqt
