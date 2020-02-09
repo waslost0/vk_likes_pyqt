@@ -4,9 +4,9 @@ import sys
 import time
 from string import Template
 from PyQt5 import QtCore, QtGui, QtWidgets
-from test_ui import Ui_MainWindow
+from ui_py.test_ui import Ui_MainWindow
 from logic import load_data_from_file, User, save_data_to_file
-from error_ui import Ui_Error
+from ui_py.error_ui import Ui_Error
 
 
 def resource_path(relative_path):
