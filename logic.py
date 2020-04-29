@@ -4,6 +4,7 @@ import logging
 import os
 import pickle
 import re
+import sys
 import time
 import random
 import string
@@ -14,6 +15,8 @@ from bs4 import BeautifulSoup as BS
 # logging.basicConfig(format=u'%(filename)s[LINE:%(lineno)-4s]# %(levelname)-4s [%(asctime)s]  %(message)s',
 #                     level=logging.INFO)
 
+with open('mylog.log', 'w') as f:
+    f.writelines('')
 
 logging.basicConfig(format=u'%(filename)s[LINE:%(lineno)-2s]# %(levelname)-8s [%(asctime)s] %(message)s',
                     level=logging.DEBUG, filename=u'mylog.log')
@@ -25,6 +28,7 @@ class User:
     def __init__(self, username, password):
         self.username = username
         self.password = password
+        self.banned_users = []
         self.token = None
         self.session = requests.Session()
         self.headers = {
@@ -126,6 +130,17 @@ class User:
         except (ConnectionError, RuntimeError, KeyError) as error:
             logging.error(error)
 
+    def get_user_id_to_ban(self, username):
+        try:
+            response = self.session.get(f"https://vk.com{username}")
+            response_bs = BS(response.text, 'html.parser')
+            result = response_bs.find_all("a", attrs={
+                "class": "BtnStack__btn button wide_button acceptFriendBtn Btn Btn_theme_regular"})
+        except Exception as e:
+            logging.error(e)
+        else:
+            return result
+
     def get_user_id(self):
         """
            Get vk user id.
@@ -158,7 +173,7 @@ class User:
             if 'error' in response:
                 logging.info("Причина: %s", response['error_description'])
         except ConnectionError as error:
-            print("Connection error")
+            logging.error("Connection error")
         else:
             self.user_id = self.get_user_id()
             return self.token
@@ -222,28 +237,39 @@ class User:
             logging.info('Result %s', response)
             return response
 
-    def add_likest_task(self, likes_count, like_url):
+    def add_likest_task(self, likes_count, like_url, repost_like, reward=''):
         """
            Add likest task like.
 
         """
         get_likes_url = 'https://likest.ru/system/ajax'
-
+        form_id = ''
         try:
             # form_build_id form_token
-            get_likest_form = self.session.get('https://likest.ru/buy-likes',
-                                               headers=self.headers)
+            if repost_like == 'l':
+                get_likest_form = self.session.get('https://likest.ru/buy-likes',
+                                                   headers=self.headers)
+                form_id = 'hpoints_buy_likes_form'
+                _triggering_element_value = 'Заказать'
+
+
+            else:
+                get_likest_form = self.session.get('https://likest.ru/reposts/add',
+                                                   headers=self.headers)
+                form_id = 'hpoints_reposts_add_form'
+                _triggering_element_value = 'Получить репосты'
+
             soup = BS(get_likest_form.content, 'lxml')
             form_build_id = soup.select('input[name=form_build_id]')
             form_token = soup.select('input[name=form_token]')
 
             form_build_id = str(form_build_id).split('"')[5]
-
             form_token = str(form_token).split('"')[5]
 
             payload = {
-                "title": random.choice(string.ascii_letters),
+                "title": like_url,
                 "link": like_url,
+                "reward": reward,
                 "amount": likes_count,
                 "sex": "0",
                 "country": "0",
@@ -256,20 +282,115 @@ class User:
                 "sleepy_factor": "0",
                 "form_build_id": form_build_id,
                 "form_token": form_token,
-                "form_id": "hpoints_buy_likes_form",
+                "form_id": form_id,
                 "_triggering_element_name": "op",
-                "_triggering_element_value": "Заказать"
+                "_triggering_element_value": _triggering_element_value
             }
 
-            self.session.head('https://likest.ru/buy-likes')
+            if repost_like == 'l':
+                self.session.head('https://likest.ru/buy-likes')
+            else:
+                self.session.head('https://likest.ru/reposts/add')
 
             response = self.session.post(get_likes_url, data=payload,
                                          headers=self.headers)
             logging.info(response)
+
         except (ConnectionError, TimeoutError, ValueError, RuntimeError) as error:
             logging.error(error)
         else:
             logging.info('Task added!!!!')
+
+    def get_likes_list(self):
+        try:
+            req_url = "https://vk.com/wkview.php"
+            data = {
+                "act": "show",
+                "al": 1,
+                "loc": f"wall{self.user_id}_{self.item_id}",
+                "location_owner_id": self.user_id,
+                "w": f"likes/wall{self.user_id}_{self.item_id}"
+            }
+            users = []
+            response = requests.post(req_url, data)
+            response = response.text.replace("\\", "")
+            token_bs = BS(response, 'html.parser')
+
+            for a in token_bs.find_all("a", attrs={"class": "fans_fan_lnk"}):
+                users.append(a["href"])
+        except Exception as e:
+            logging.error(e)
+        else:
+            return users
+
+    def ban_user_report(self):
+        """
+                   Listen and ban users/delete_likes which like repost.
+                """
+        users_list = []
+        try:
+            users_list = self.get_likes_list()
+        except KeyError as error:
+            logging.error(error)
+
+        for user in users_list:
+            if "/id" not in user:
+                user = self.get_user_id_to_ban(user)
+            else:
+                user = user.replace("/id", "")
+                data = {
+                    'act': 'spam',
+                    'al': '1',
+                    'mid': user,
+                    'object': 'wall' + str(self.user_id) + '_' + str(self.item_id)
+                }
+
+                response = self.session.post('https://vk.com/like.php',
+                                             data=data)
+                res = re.findall('hash: \'(?:[a-zA-Z]|[0-9])+', str(response.text))[0]
+                res = res.replace('hash: \'', '')
+                user_hash = res.replace('"', '')
+
+                data = {
+                    'act': 'do_spam',
+                    'al': '1',
+                    'hash': user_hash,
+                    'mid': user,
+                    'object': 'wall' + str(self.user_id) + '_' + str(self.item_id)
+                }
+
+                self.session.post('https://vk.com/like.php',
+                                  data=data)
+                self.banned_users.append(user)
+        time.sleep(0.3)
+
+    def unban_users(self):
+        # for user in self.banned_users:
+        response = self.session.post('https://vk.com/settings?act=blacklist')
+
+        # res = re.findall('hash: \'(?:[a-zA-Z]|[0-9])+', str(response.text))[0]
+        res = re.findall(f'Settings.delFromBl\((?:[0-9]+), \'(?:[a-zA-Z]|[0-9])+', str(response.text))
+
+        # Settings.delFromBl(220788908, '4efe9b985fff032997', this); return false;
+        for user_hash in res:
+            user_hash = user_hash \
+                .replace(f'Settings.delFromBl(', '') \
+                .replace(" \\", "") \
+                .replace("'", "") \
+                .replace(" ", "").split(",")
+            user = user_hash[0]
+            hash_user = user_hash[1]
+
+            data = {
+                'act': 'a_del_from_bl',
+                'al': '1',
+                'from': 'settings',
+                'hash': hash_user,
+                'id': user
+            }
+            print(data)
+            self.session.post('https://vk.com/al_settings.php',
+                              data=data)
 
     def ban_users(self):
         """
@@ -282,6 +403,8 @@ class User:
                 'item_id': self.item_id,
                 'type': 'post'
             })).json()
+
+            logging.info(req_likes)
             if 'response' in req_likes:
                 if req_likes['response']['count'] != 0:
                     logging.info(req_likes)
@@ -324,8 +447,9 @@ class User:
                 f'access_token={self.token}&'
                 f'owner_id={user}&v=5.103').json()
             logging.info(response)
-            time.sleep(0.4)
-        time.sleep(2)
+            time.sleep(0.6)
+        time.sleep(1)
+        users = []
 
     def get_data_from_link(self, link_to_search):
         """
@@ -333,7 +457,6 @@ class User:
         """
         try:
             base = (re.findall('wall-?(.+)_(\\d+)', link_to_search))
-            print(base)
             if not base:
                 raise IndexError
         except IndexError as error:
@@ -377,7 +500,7 @@ def load_data_from_file():
     try:
         if not os.path.exists('data.txt'):
             with open('data.txt', 'w') as f:
-                f.write('{}')            
+                f.write('{}')
 
         with open('data.txt') as json_file:
             data = json.load(json_file)

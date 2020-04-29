@@ -55,7 +55,7 @@ background-color: rgb(30, 39, 44);</string>
      <string notr="true"/>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="vkloginPage">
      <widget class="QWidget" name="layoutWidget">
@@ -86,36 +86,43 @@ background-color: rgb(30, 39, 44);</string>
        <property name="bottomMargin">
         <number>23</number>
        </property>
-       <item alignment="Qt::AlignHCenter">
-        <widget class="QLabel" name="vkImage">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>100</width>
-           <height>100</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>100</width>
-           <height>100</height>
-          </size>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
-         <property name="midLineWidth">
-          <number>2</number>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="scaledContents">
-          <bool>true</bool>
-         </property>
-        </widget>
+       <item>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="vkImage">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>100</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>100</width>
+             <height>100</height>
+            </size>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <property name="midLineWidth">
+            <number>2</number>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="scaledContents">
+            <bool>true</bool>
+           </property>
+           <property name="margin">
+            <number>0</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <widget class="QLineEdit" name="lineEdit">
@@ -369,7 +376,7 @@ background-color: rgb(30, 39, 44);</string>
        </font>
       </property>
       <property name="text">
-       <string>Result</string>
+       <string/>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
@@ -661,6 +668,234 @@ background-color: rgb(30, 39, 44);</string>
       </property>
      </widget>
     </widget>
+    <widget class="QWidget" name="repostPage">
+     <widget class="QLabel" name="ResultStartLikes_R">
+      <property name="geometry">
+       <rect>
+        <x>430</x>
+        <y>180</y>
+        <width>191</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>URW Gothic L</family>
+        <pointsize>12</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="lineWidth">
+       <number>-1</number>
+      </property>
+      <property name="midLineWidth">
+       <number>0</number>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignBottom|Qt::AlignJustify</set>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <property name="indent">
+       <number>0</number>
+      </property>
+     </widget>
+     <widget class="QWidget" name="layoutWidget_9">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>30</y>
+        <width>671</width>
+        <height>81</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_21">
+       <item>
+        <widget class="QLineEdit" name="LabelRepostsUrl">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <family>URW Gothic L</family>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(35, 46, 52);</string>
+         </property>
+         <property name="placeholderText">
+          <string>Repost URL</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="SaveUrlButton_R">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Save</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QCheckBox" name="RepostsCheckBox">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>140</y>
+        <width>161</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Auto add likest task</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="ResultSaveUrl_R">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>110</y>
+        <width>471</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>URW Gothic L</family>
+        <pointsize>13</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QToolButton" name="StartLikes_R">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>170</y>
+        <width>91</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(154, 255, 152);</string>
+      </property>
+      <property name="text">
+       <string>Start</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="RepostsCount">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>170</y>
+        <width>111</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>URW Gothic L</family>
+       </font>
+      </property>
+      <property name="toolTipDuration">
+       <number>-1</number>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="cursorPosition">
+       <number>0</number>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="placeholderText">
+       <string>Reposts Count</string>
+      </property>
+     </widget>
+     <widget class="QToolButton" name="StopLikes_R">
+      <property name="geometry">
+       <rect>
+        <x>340</x>
+        <y>170</y>
+        <width>91</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 121, 123);</string>
+      </property>
+      <property name="text">
+       <string>Stop</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="Reward">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>170</y>
+        <width>111</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>URW Gothic L</family>
+       </font>
+      </property>
+      <property name="toolTipDuration">
+       <number>-1</number>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="cursorPosition">
+       <number>0</number>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="placeholderText">
+       <string>Reward</string>
+      </property>
+     </widget>
+     <zorder>ResultStartLikes_R</zorder>
+     <zorder>layoutWidget_9</zorder>
+     <zorder>ResultSaveUrl_R</zorder>
+     <zorder>StartLikes_R</zorder>
+     <zorder>RepostsCount</zorder>
+     <zorder>StopLikes_R</zorder>
+     <zorder>RepostsCheckBox</zorder>
+     <zorder>Reward</zorder>
+    </widget>
    </widget>
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
@@ -699,6 +934,9 @@ background-color: rgb(30, 39, 44);</string>
      </item>
      <item alignment="Qt::AlignRight">
       <widget class="QPushButton" name="ReposButton">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
