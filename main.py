@@ -1,5 +1,6 @@
 import logging
 import os
+import subprocess
 import sys
 import time
 import json
@@ -11,6 +12,8 @@ import lxml
 import requests
 from string import Template
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import QThread
+from PyQt5.QtWidgets import QMessageBox
 
 from ui_py.test_ui import Ui_MainWindow
 from logic import load_data_from_file, User, save_data_to_file
@@ -58,6 +61,8 @@ class MyyWindow(QtWidgets.QMainWindow):
         # error dialog
         # self.setStyleSheet(css)
         self.err_dialog = ErrorDialog()
+        self.data_result = None
+        self.m_modbus_worker = None
         # подключение клик-сигнал к слоту btnClicked
         self.ui.LikesButton.clicked.connect(self.set_page_view_likes)
         self.ui.LogsButton.clicked.connect(self.set_page_view_logs)
@@ -79,13 +84,6 @@ class MyyWindow(QtWidgets.QMainWindow):
             logging.Formatter('%(filename)s[LINE:%(lineno)-4s]'
                               ' #%(levelname)-4s [%(asctime)s]  %(message)s'))
         logging.getLogger().addHandler(log_handler)
-
-        # async data loader
-        # self.d_thread = QtCore.QThread()
-        # self.data_loader = DataLoader(self)
-        # self.data_loader.moveToThread(self.d_thread)
-        # self.d_thread.start()
-        # QtCore.QTimer.singleShot(0, self.data_loader.loading_data)
 
         self.data = None
         self.user = None
@@ -137,21 +135,29 @@ class MyyWindow(QtWidgets.QMainWindow):
             self.user.user_id = self.data['user_id']
 
     def save_coupon(self):
-        coupon = self.ui.LabelCoupon.text()
-        result_coupon = self.user.activate_coupon(coupon)
-
-        if 'SUCCESS' in result_coupon['status']:
-            self.ui.ResultCoupon.setStyleSheet("color: rgb(154, 255, 152);")
-            self.ui.ResultCoupon.setText('Activated')
+        if not self.user:
+            self.err_dialog.set_text("You must log in")
+            self.err_dialog.exec_()
         else:
-            self.ui.ResultCoupon.setStyleSheet("color: rgb(195, 15, 18);")
-            self.ui.ResultCoupon.setText('Not activated')
+            coupon = self.ui.LabelCoupon.text()
+            result_coupon = self.user.activate_coupon(coupon)
+
+            if 'SUCCESS' in result_coupon['status']:
+                self.ui.ResultCoupon.setStyleSheet("color: rgb(154, 255, 152);")
+                self.ui.ResultCoupon.setText('Activated')
+            else:
+                self.ui.ResultCoupon.setStyleSheet("color: rgb(195, 15, 18);")
+                self.ui.ResultCoupon.setText('Not activated')
 
     def get_likest_balance(self):
-        self.likes_balance = self.user.get_likes_balance()
-        if 'balance' in self.likes_balance:
-            cur_bal = self.likes_balance['balance']
-            self.ui.LikesBalanceLabel.setText(str(cur_bal))
+        if not self.user:
+            self.err_dialog.set_text("You must log in")
+            self.err_dialog.exec_()
+        else:
+            self.likes_balance = self.user.get_likes_balance()
+            if 'balance' in self.likes_balance:
+                cur_bal = self.likes_balance['balance']
+                self.ui.LikesBalanceLabel.setText(str(cur_bal))
 
     def on_succ_login(self):
         if self.login_result:
@@ -165,105 +171,119 @@ class MyyWindow(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot()
     def start(self):
-        logging.info('Starting ban users.')
-        repost_or_like = ''
-        reward = None
-        if self.current_window == 3:
-            repost_or_like = 'r'
-            reward = self.ui.Reward.text()
-            repost_count = self.ui.RepostsCount.text()
+        if not self.user or not self.data_result:
+            if not self.data_result:
+                self.err_dialog.set_text("You must add url")
+            else:
+                self.err_dialog.set_text("You must log in")
+            self.err_dialog.exec_()
         else:
-            repost_or_like = 'l'
-            repost_count = self.ui.LikesCount.text()
+            logging.info('Starting ban users.')
+            repost_or_like = ''
+            reward = None
+            if self.current_window == 3:
+                repost_or_like = 'r'
+                reward = self.ui.Reward.text()
+                repost_count = self.ui.RepostsCount.text()
+            else:
+                repost_or_like = 'l'
+                repost_count = self.ui.LikesCount.text()
 
-        if self.ui.LikestCheckBox.isChecked() or self.ui.RepostsCheckBox.isChecked():
-            like_url = f'https://vk.com/wall{self.user.user_id}_{self.user.item_id}'
+            if self.ui.LikestCheckBox.isChecked() or self.ui.RepostsCheckBox.isChecked():
+                like_url = f'https://vk.com/wall{self.user.user_id}_{self.user.item_id}'
 
-            save_data_to_file(url_tolike=like_url, post_id=self.user.item_id)
-            self.user.add_likest_task(likes_count=repost_count, like_url=like_url, repost_like=repost_or_like,
-                                      reward=reward)
+                save_data_to_file(url_tolike=like_url, post_id=self.user.item_id)
+                self.user.add_likest_task(likes_count=repost_count, like_url=like_url, repost_like=repost_or_like,
+                                          reward=reward)
+
+                if self.current_window == 3:
+                    self.ui.ResultSaveUrl_R.setStyleSheet("color: rgb(154, 255, 152);")
+                    self.ui.ResultSaveUrl_R.setText("Task added")
+                else:
+                    self.ui.ResultSaveUrl.setText("Task added!")
+            else:
+                logging.info('Not log likest')
+                if self.current_window == 3:
+                    self.ui.ResultSaveUrl_R.setText("You must add a task.")
+                else:
+                    self.ui.ResultSaveUrl.setText("You must add a task.")
+
+            self.m_thread = QtCore.QThread(self)
+            self.m_modbus_worker = ModbusWorker(self.user)
+            self.m_modbus_worker.moveToThread(self.m_thread)
+            self.m_thread.start()
+            QtCore.QTimer.singleShot(0, self.m_modbus_worker.do_work)
 
             if self.current_window == 3:
-                self.ui.ResultSaveUrl_R.setStyleSheet("color: rgb(154, 255, 152);")
-                self.ui.ResultSaveUrl_R.setText("Task added")
+                self.ui.ResultStartLikes_R.setStyleSheet("color: rgb(154, 255, 152);")
+                self.ui.ResultStartLikes_R.setText("  Started!")
             else:
-                self.ui.ResultSaveUrl.setText("Task added!")
-        else:
-            logging.info('Not log likest')
-            if self.current_window == 3:
-                self.ui.ResultSaveUrl_R.setText("You must add a task.")
-            else:
-                self.ui.ResultSaveUrl.setText("You must add a task.")
-
-        self.m_thread = QtCore.QThread(self)
-        self.m_modbus_worker = ModbusWorker(self.user, self.current_window)
-        self.m_modbus_worker.moveToThread(self.m_thread)
-        self.m_thread.start()
-        QtCore.QTimer.singleShot(0, self.m_modbus_worker.do_work)
-
-        if self.current_window == 3:
-            self.ui.ResultStartLikes_R.setStyleSheet("color: rgb(154, 255, 152);")
-            self.ui.ResultStartLikes_R.setText("  Started!")
-        else:
-            self.ui.ResultStartLikes.setStyleSheet("color: rgb(154, 255, 152);")
-            self.ui.ResultStartLikes.setText("  Started!")
+                self.ui.ResultStartLikes.setStyleSheet("color: rgb(154, 255, 152);")
+                self.ui.ResultStartLikes.setText("  Started!")
 
     @QtCore.pyqtSlot()
     def stop(self):
+        if self.m_modbus_worker:
+            self.m_modbus_worker.stop()
+            self.m_modbus_worker.terminate()
         if self.m_thread:
             self.m_thread.requestInterruption()
             self.ui.ResultStartLikes.setStyleSheet("color: rgb(195, 15, 18);")
             self.ui.ResultStartLikes_R.setStyleSheet("color: rgb(195, 15, 18);")
             self.ui.ResultStartLikes.setText(" Wait!")
             self.ui.ResultStartLikes_R.setText(" Wait!")
-
             self.user.delete_repost()
             self.user.unban_users()
             self.ui.ResultStartLikes_R.setStyleSheet("color: rgb(154, 255, 152);")
             self.ui.ResultStartLikes.setStyleSheet("color: rgb(154, 255, 152);")
             self.ui.ResultStartLikes.setText(" Stopped")
             self.ui.ResultStartLikes_R.setText(" Stopped")
-
+            self.m_thread.quit()
+            self.m_thread.wait()
             sys.exit(self.m_thread.exec())
 
     def save_url(self):
-        if self.current_window == 3:
-            url = self.ui.LabelRepostsUrl.text()
+        if not self.user:
+            self.err_dialog.set_text("You must log in")
+            self.err_dialog.exec_()
         else:
-            url = self.ui.LabelLikesUrl.text()
-
-        if url is None:
-            url = self.ui.LabelRepostsUrl.text()
-
-        data_result = self.user.get_data_from_link(url)
-        data_from_db = {}
-
-        if not url:
-            self.ui.ResultSaveUrl.setStyleSheet("color: rgb(195, 15, 18);")
-            self.ui.ResultSaveUrl.setText("Enter Url")
             if self.current_window == 3:
-                self.ui.ResultSaveUrl_R.setStyleSheet("color: rgb(195, 15, 18);")
-                self.ui.ResultSaveUrl_R.setText("Enter Url")
-        elif not data_result:
-            self.ui.ResultSaveUrl.setStyleSheet("color: rgb(195, 15, 18);")
-            self.ui.ResultSaveUrl.setText("Invalid url.")
-            if self.current_window == 3:
-                self.ui.ResultSaveUrl_R.setStyleSheet("color: rgb(195, 15, 18);")
-                self.ui.ResultSaveUrl_R.setText("Invalid url.")
-        else:
-            # repost_result = self.user.make_repost(url)
-            data_from_db = save_data_to_file(url_tolike=url, post_id=data_result[1])
-            self.ui.ResultSaveUrl.setStyleSheet("color: rgb(154, 255, 152);")
-            self.ui.ResultSaveUrl.setText("Saved")
-            if self.current_window == 3:
-                self.ui.ResultSaveUrl_R.setStyleSheet("color: rgb(154, 255, 152);")
-                self.ui.ResultSaveUrl_R.setText("Saved")
-            logging.info(data_result)
+                url = self.ui.LabelRepostsUrl.text()
+            else:
+                url = self.ui.LabelLikesUrl.text()
 
-        self.ui.LabelLikesUrl.clear()
-        self.ui.LabelRepostsUrl.clear()
-        if ('login' and 'password' and 'url') in data_from_db:
-            logging.info(data_from_db)
+            if url is None:
+                url = self.ui.LabelRepostsUrl.text()
+
+            self.data_result = self.user.get_data_from_link(url)
+            data_from_db = {}
+
+            if not url:
+                self.ui.ResultSaveUrl.setStyleSheet("color: rgb(195, 15, 18);")
+                self.ui.ResultSaveUrl.setText("Enter Url")
+                if self.current_window == 3:
+                    self.ui.ResultSaveUrl_R.setStyleSheet("color: rgb(195, 15, 18);")
+                    self.ui.ResultSaveUrl_R.setText("Enter Url")
+            elif not self.data_result:
+                self.ui.ResultSaveUrl.setStyleSheet("color: rgb(195, 15, 18);")
+                self.ui.ResultSaveUrl.setText("Invalid url.")
+                if self.current_window == 3:
+                    self.ui.ResultSaveUrl_R.setStyleSheet("color: rgb(195, 15, 18);")
+                    self.ui.ResultSaveUrl_R.setText("Invalid url.")
+            else:
+                # repost_result = self.user.make_repost(url)
+                data_from_db = save_data_to_file(url_tolike=url, post_id=self.data_result[1])
+                self.ui.ResultSaveUrl.setStyleSheet("color: rgb(154, 255, 152);")
+                self.ui.ResultSaveUrl.setText("Saved")
+                if self.current_window == 3:
+                    self.ui.ResultSaveUrl_R.setStyleSheet("color: rgb(154, 255, 152);")
+                    self.ui.ResultSaveUrl_R.setText("Saved")
+                logging.info(self.data_result)
+
+            self.ui.LabelLikesUrl.clear()
+            self.ui.LabelRepostsUrl.clear()
+            if ('login' and 'password' and 'url') in data_from_db:
+                logging.info(data_from_db)
 
     def set_page_view_likes(self):
         self.current_window = 2
@@ -314,64 +334,49 @@ class MyyWindow(QtWidgets.QMainWindow):
             self.ui.ResultOfLogin.setText("Successful login\nData saved to data.txt")
 
 
-class ModbusWorker(QtCore.QObject):
-    def __init__(self, user, current_window):
+class ModbusWorker(QThread):
+    def __init__(self, user):
         super().__init__()
         self.user = user
-        self.current_window = current_window
+        self.threadactive = True
 
     @QtCore.pyqtSlot()
     def do_work(self):
-        while not QtCore.QThread.currentThread().isInterruptionRequested():
+        while not QtCore.QThread.currentThread().isInterruptionRequested() or self.threadactive:
             # res = self.user.ban_user_report()
             self.user.ban_user_report()
 
+    def stop(self):
+        self.threadactive = False
+        self.wait()
 
-# async dataloader
-# class DataLoader(QtCore.QObject):
-#     def __init__(self, parent=None):
-#         super(DataLoader, self).__init__(parent)
-#         self.err_dialog = ErrorDialog()
-#
-#     @QtCore.pyqtSlot()
-#     def loading_data(self):
-#         try:
-#             logging.info('Trying to load all data from file')
-#             self.data = load_data_from_file()
-#
-#         except Exception as e:
-#             logging.error(e)
-#         else:
-#             if not self.data:
-#                 self.err_dialog.set_text('Data is empty. You must log in!')
-#                 self.err_dialog.show()
-#                 logging.info('Data is empty. You must log in!')
-#             else:
-#                 logging.info(self.data)
-#
-#         if 'login' in self.data and 'password' in self.data and 'token' in self.data:
-#             self.token = self.data['token']
-#             self.user = User(username=self.data['login'], password=self.data['password'], token=self.data['token'])
-#             self.login_result = self.user.login()
-#
-#         elif ('token' not in self.data) and ('login' in self.data):
-#             self.user = User(username=self.data['login'], password=self.data['password'])
-#             self.user.login()
-#             self.token = self.user.get_token()
-#             logging.info(f"Ur token {self.token}")
-#             self.data_saved = save_data_to_file(login=self.data['login'], password=self.data['password'],
-#                                                 token=self.token)
-#             logging.info("Saved data %(data)", self.data_saved)
-#
-#         print('LOADED')
+
+def check_hwid():
+    response = requests.get("https://pastebin.com/raw/vNkGmGNi")
+    user_hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
+    if user_hwid in response.text:
+        return True
+    else:
+        return False
+
 
 if __name__ == '__main__':
-    app = QtWidgets.QApplication([])
-    app.setStyle('Windows')
-    app.setQuitOnLastWindowClosed(True)
-    application = MyyWindow()
-    application.show()
-    sys.exit(app.exec())
+    try:
+        if check_hwid():
+            app = QtWidgets.QApplication([])
+            app.setStyle('Windows')
+            # app.setQuitOnLastWindowClosed(True)
+            application = MyyWindow()
+            application.show()
+            sys.exit(app.exec())
+        else:
+            app = QtWidgets.QApplication([])
+            error_dialog = ErrorDialog()
+            error_dialog.set_text('You are not Subscribed!')
+            error_dialog.show()
+            app.exec_()
+    except Exception as e:
+        raise e
 
 '''
 beta.alfaliker.com /бан ссылки 10-15 мин

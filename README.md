@@ -6,6 +6,9 @@
 
 ![VkLikes](https://i.imgur.com/r8MoovW.png)
 
+ pyarmor pack -e "--onefile --icon=ic.ico --add-data 'vk.png;.'" main.py
+
+http://pyob.oxyry.com
 
 
 

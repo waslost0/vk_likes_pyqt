@@ -160,10 +160,7 @@ class User:
         client_secret = 'hHbZxrka2uZ6jB1inYsH'
         response = {}
 
-        url = f'https://oauth.vk.com/token?grant_type=password&client_id={client_id}&' \
-              f'client_secret={client_secret}' \
-              f'&username={self.username}' \
-              f'&password={self.password}&v=5.103&2fa_supported=1'
+        url = f'https://oauth.vk.com/token?grant_type=password&client_id={client_id}&client_secret={client_secret}&username={self.username}&password={self.password}&v=5.103&2fa_supported=1'
         try:
             response = requests.get(url).json()
             self.token = response['access_token']
@@ -245,7 +242,6 @@ class User:
         get_likes_url = 'https://likest.ru/system/ajax'
         form_id = ''
         try:
-            # form_build_id form_token
             if repost_like == 'l':
                 get_likest_form = self.session.get('https://likest.ru/buy-likes',
                                                    headers=self.headers)
@@ -365,19 +361,12 @@ class User:
         time.sleep(0.3)
 
     def unban_users(self):
-        # for user in self.banned_users:
         response = self.session.post('https://vk.com/settings?act=blacklist')
 
-        # res = re.findall('hash: \'(?:[a-zA-Z]|[0-9])+', str(response.text))[0]
         res = re.findall(f'Settings.delFromBl\((?:[0-9]+), \'(?:[a-zA-Z]|[0-9])+', str(response.text))
 
-        # Settings.delFromBl(220788908, '4efe9b985fff032997', this); return false;
         for user_hash in res:
-            user_hash = user_hash \
-                .replace(f'Settings.delFromBl(', '') \
-                .replace(" \\", "") \
-                .replace("'", "") \
-                .replace(" ", "").split(",")
+            user_hash = user_hash.replace(f'Settings.delFromBl(', '').replace(" \\", "").replace("'", "").replace(" ", "").split(",")
             user = user_hash[0]
             hash_user = user_hash[1]
 
@@ -442,10 +431,7 @@ class User:
                               data=data)
 
         for user in users:
-            response = requests.get(
-                f'https://api.vk.com/method/account.unban?'
-                f'access_token={self.token}&'
-                f'owner_id={user}&v=5.103').json()
+            response = requests.get('https://api.vk.com/method/account.unban?access_token={self.token}&owner_id={user}&v=5.103').json()
             logging.info(response)
             time.sleep(0.6)
         time.sleep(1)
