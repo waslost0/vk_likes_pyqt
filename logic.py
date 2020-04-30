@@ -131,11 +131,22 @@ class User:
             logging.error(error)
 
     def get_user_id_to_ban(self, username):
+        result = None
         try:
-            response = self.session.get(f"https://vk.com{username}")
+            username.replace("/", "")
+            response = self.session.get(f"https://vk.com/{username}")
+            print(response.text)
             response_bs = BS(response.text, 'html.parser')
-            result = response_bs.find_all("a", attrs={
-                "class": "BtnStack__btn button wide_button acceptFriendBtn Btn Btn_theme_regular"})
+
+            for a in response_bs.find_all("a", attrs={"class": "BtnStack__btn button wide_button acceptFriendBtn Btn Btn_theme_regular"}):
+                result = a['data-uid']
+                break
+
+            # result = result.replace("return Profile.showGiftBox(", "").replace(", event, 'profile_button');")
+
+            if result is None:
+                result = self.method('users.get', ({'user_ids': username})).json()
+                result = result['response']['id']
         except Exception as e:
             logging.error(e)
         else:
@@ -332,33 +343,32 @@ class User:
         for user in users_list:
             if "/id" not in user:
                 user = self.get_user_id_to_ban(user)
-            else:
-                user = user.replace("/id", "")
-                data = {
-                    'act': 'spam',
-                    'al': '1',
-                    'mid': user,
-                    'object': 'wall' + str(self.user_id) + '_' + str(self.item_id)
-                }
+            user = user.replace("/id", "")
+            data = {
+                'act': 'spam',
+                'al': '1',
+                'mid': user,
+                'object': 'wall' + str(self.user_id) + '_' + str(self.item_id)
+            }
 
-                response = self.session.post('https://vk.com/like.php',
-                                             data=data)
-                res = re.findall('hash: \'(?:[a-zA-Z]|[0-9])+', str(response.text))[0]
-                res = res.replace('hash: \'', '')
-                user_hash = res.replace('"', '')
+            response = self.session.post('https://vk.com/like.php',
+                                         data=data)
+            res = re.findall('hash: \'(?:[a-zA-Z]|[0-9])+', str(response.text))[0]
+            res = res.replace('hash: \'', '')
+            user_hash = res.replace('"', '')
 
-                data = {
-                    'act': 'do_spam',
-                    'al': '1',
-                    'hash': user_hash,
-                    'mid': user,
-                    'object': 'wall' + str(self.user_id) + '_' + str(self.item_id)
-                }
+            data = {
+                'act': 'do_spam',
+                'al': '1',
+                'hash': user_hash,
+                'mid': user,
+                'object': 'wall' + str(self.user_id) + '_' + str(self.item_id)
+            }
 
-                self.session.post('https://vk.com/like.php',
-                                  data=data)
-                self.banned_users.append(user)
-        time.sleep(0.3)
+            self.session.post('https://vk.com/like.php',
+                              data=data)
+            self.banned_users.append(user)
+        time.sleep(0.1)
 
     def unban_users(self):
         response = self.session.post('https://vk.com/settings?act=blacklist')
