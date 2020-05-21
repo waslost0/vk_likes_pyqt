@@ -9,6 +9,7 @@ import re
 import random
 import string
 import lxml
+from random import choice
 import requests
 from string import Template
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -18,7 +19,10 @@ from PyQt5.QtWidgets import QMessageBox
 from ui_py.test_ui import Ui_MainWindow
 from logic import load_data_from_file, User, save_data_to_file
 from ui_py.error_ui import Ui_Error
+from ui_py.hwid import Ui_Hwid
 from bs4 import BeautifulSoup as BS
+from PyQt5.QtCore import (QCoreApplication, QObject, QRunnable, QThread,
+                          QThreadPool, pyqtSignal)
 
 
 def resource_path(relative_path):
@@ -48,6 +52,19 @@ class ErrorDialog(QtWidgets.QDialog):
 
     def set_text(self, text):
         self.ui.label.setText(text)
+
+
+class HwidDialog(QtWidgets.QDialog):
+    def __init__(self, parent=None):
+        super(HwidDialog, self).__init__(parent)
+        self.ui = Ui_Hwid()
+        self.ui.setupUi(self)
+
+    def set_text(self, text):
+        self.ui.label_2.setText(text)
+
+    def set_hwid(self, text):
+        self.ui.lineEdit.setText(text)
 
 
 class MyyWindow(QtWidgets.QMainWindow):
@@ -80,9 +97,12 @@ class MyyWindow(QtWidgets.QMainWindow):
         self.ui.ReposButton.clicked.connect(self.set_page_view_repost)
         # logs
         log_handler = QTextEditLogger(self.ui.plainTextEdit)
+
         log_handler.setFormatter(
             logging.Formatter('%(filename)s[LINE:%(lineno)-4s]'
                               ' #%(levelname)-4s [%(asctime)s]  %(message)s'))
+        logging.getLogger("getmac").setLevel(logging.WARNING)
+
         logging.getLogger().addHandler(log_handler)
 
         self.data = None
@@ -98,6 +118,7 @@ class MyyWindow(QtWidgets.QMainWindow):
 
         self.ui.StopLikes_R.clicked.connect(self.stop)
         self.ui.StartLikes_R.clicked.connect(self.start)
+        self.is_login_likest = False
 
         try:
             logging.info('Trying to load all data from file')
@@ -115,7 +136,11 @@ class MyyWindow(QtWidgets.QMainWindow):
 
             self.login_result = self.user.login()
             self.ui.ResultOfLogin.setText(f"Welcome back {self.login_result}")
-            self.user.login_likest()
+            try:
+                self.is_login_likest = self.user.login_likest()
+
+            except Exception as e:
+                logging.error(e)
 
         elif ('token' not in self.data) and ('login' in self.data):
             self.user = User(username=self.data['login'], password=self.data['password'])
@@ -129,7 +154,10 @@ class MyyWindow(QtWidgets.QMainWindow):
                 password=self.data['password'],
                 token=self.token
             )
-            self.user.login_likest()
+            try:
+                self.is_login_likest = self.user.login_likest()
+            except Exception as e:
+                logging.error(e)
             logging.info(f"Saved data {self.data_saved}")
         if 'user_id' in self.data:
             self.user.user_id = self.data['user_id']
@@ -189,7 +217,7 @@ class MyyWindow(QtWidgets.QMainWindow):
                 repost_or_like = 'l'
                 repost_count = self.ui.LikesCount.text()
 
-            if self.ui.LikestCheckBox.isChecked() or self.ui.RepostsCheckBox.isChecked():
+            if (self.ui.LikestCheckBox.isChecked() or self.ui.RepostsCheckBox.isChecked()) and self.is_login_likest:
                 like_url = f'https://vk.com/wall{self.user.user_id}_{self.user.item_id}'
 
                 save_data_to_file(url_tolike=like_url, post_id=self.user.item_id)
@@ -203,6 +231,9 @@ class MyyWindow(QtWidgets.QMainWindow):
                     self.ui.ResultSaveUrl.setText("Task added!")
             else:
                 logging.info('Not log likest')
+                if self.is_login_likest is False:
+                    self.err_dialog.set_text("You can`t add task. Because you are not logged likes.")
+                    self.err_dialog.show()
                 if self.current_window == 3:
                     self.ui.ResultSaveUrl_R.setText("You must add a task.")
                 else:
@@ -223,6 +254,8 @@ class MyyWindow(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot()
     def stop(self):
+        runnable = Runnable(self.user)
+        QThreadPool.globalInstance().start(runnable)
         if self.m_modbus_worker:
             self.m_modbus_worker.stop()
             self.m_modbus_worker.terminate()
@@ -233,7 +266,6 @@ class MyyWindow(QtWidgets.QMainWindow):
             self.ui.ResultStartLikes.setText(" Wait!")
             self.ui.ResultStartLikes_R.setText(" Wait!")
             self.user.delete_repost()
-            self.user.unban_users()
             self.ui.ResultStartLikes_R.setStyleSheet("color: rgb(154, 255, 152);")
             self.ui.ResultStartLikes.setStyleSheet("color: rgb(154, 255, 152);")
             self.ui.ResultStartLikes.setText(" Stopped")
@@ -322,37 +354,58 @@ class MyyWindow(QtWidgets.QMainWindow):
                     token=self.user.token,
                     user_id=self.user.user_id
                 )
-                self.check_login_result(self.data)
+                self.check_login_result()
 
-    def check_login_result(self, data):
+    def check_login_result(self):
         if not self.data or not self.data['token']:
             self.ui.ResultOfLogin.setStyleSheet("color: rgb(255, 121, 123);")
             self.ui.ResultOfLogin.setText("Unsuccessful login")
         elif self.data['token']:
-            self.user.login_likest()
+            if self.ui.checkBox.isChecked():
+                self.user.login_likest()
             self.ui.ResultOfLogin.setStyleSheet("color: rgb(154, 255, 152);")
             self.ui.ResultOfLogin.setText("Successful login\nData saved to data.txt")
+
+
+class Runnable(QRunnable):
+    def __init__(self, user):
+        super().__init__()
+        self.user = user
+
+    def run(self):
+        try:
+            logging.info('Unbaning users')
+            self.user.unban_users()
+        except Exception as e:
+            logging.error(e)
 
 
 class ModbusWorker(QThread):
     def __init__(self, user):
         super().__init__()
         self.user = user
-        self.threadactive = True
 
     @QtCore.pyqtSlot()
     def do_work(self):
-        while not QtCore.QThread.currentThread().isInterruptionRequested() or self.threadactive:
-            # res = self.user.ban_user_report()
-            self.user.ban_user_report()
+        try:
+            while not QtCore.QThread.currentThread().isInterruptionRequested():
+                # res = self.user.ban_user_report()
+                self.user.ban_user_report()
+        except Exception as e:
+            logging.log(e)
+            self.user.delete_repost()
 
     def stop(self):
-        self.threadactive = False
+
         self.wait()
 
 
+def get_hwid():
+    return str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
+
+
 def check_hwid():
-    response = requests.get("https://pastebin.com/raw/vNkGmGNi")
+    response = requests.get("https://pastebin.com/raw/GFQrRHcS")
     user_hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
     if user_hwid in response.text:
         return True
@@ -368,15 +421,19 @@ if __name__ == '__main__':
             # app.setQuitOnLastWindowClosed(True)
             application = MyyWindow()
             application.show()
+            if application.is_login_likest is False and 'login' in application.data:
+                application.err_dialog.set_text(f"Unsuccessful login likest.")
+                application.err_dialog.show()
             sys.exit(app.exec())
         else:
             app = QtWidgets.QApplication([])
-            error_dialog = ErrorDialog()
-            error_dialog.set_text('You are not Subscribed!')
+            error_dialog = HwidDialog()
+            error_dialog.set_text(f'You are not Subscribed!\nHWID:')
+            error_dialog.set_hwid(get_hwid())
             error_dialog.show()
             app.exec_()
     except Exception as e:
-        raise e
+        logging.error(e)
 
 '''
 beta.alfaliker.com /бан ссылки 10-15 мин
@@ -384,4 +441,6 @@ turboliker.ru
 likes.fm
 snebes.ru
 freelikes.online net
+
+https://app.likeorgasm.com/cabinet
 '''

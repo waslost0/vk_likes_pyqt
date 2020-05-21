@@ -3,320 +3,305 @@ import json #line:2
 import logging #line:3
 import os #line:4
 import pickle #line:5
-import re #line:6
-import sys #line:7
-import time #line:8
-import random #line:9
-import string #line:10
-import requests #line:12
-from bs4 import BeautifulSoup as BS #line:13
-with open ('mylog.log','w')as f :#line:18
-    f .writelines ('')#line:19
-logging .basicConfig (format =u'%(filename)s[LINE:%(lineno)-2s]# %(levelname)-8s [%(asctime)s] %(message)s',level =logging .DEBUG ,filename =u'mylog.log')#line:22
-class User :#line:25
-    ""#line:26
-    def __init__ (O000O0O000OO00OOO ,O00000OO0O000OOO0 ,OOOO0000O0OO0O000 ):#line:28
-        O000O0O000OO00OOO .username =O00000OO0O000OOO0 #line:29
-        O000O0O000OO00OOO .password =OOOO0000O0OO0O000 #line:30
-        O000O0O000OO00OOO .banned_users =[]#line:31
-        O000O0O000OO00OOO .token =None #line:32
-        O000O0O000OO00OOO .session =requests .Session ()#line:33
-        O000O0O000OO00OOO .headers ={'User-Agent':'Mozilla/5.0 (X11; Linux x86_64)' ' AppleWebKit/537.36 (KHTML, like Gecko)' ' Chrome/79.0.3945.130 Safari/537.36','Accept':'*/*','Accept-Language':'en-US,en;q=0.9,ru-RU;q=0.8,ru;q=0.7','Accept-Encoding':'gzip, deflate, br','Connection':'keep-alive'}#line:42
-        O000O0O000OO00OOO .item_id =None #line:44
-        O000O0O000OO00OOO .user_id =None #line:45
-    def method (O0OO0OO000OOO000O ,O0OOO00O0O000OOO0 ,values =None ):#line:47
-        ""#line:52
-        try :#line:53
-            if values is None :#line:54
-                values ={}#line:55
-            values ['v']='5.103'#line:56
-            if O0OO0OO000OOO000O .token :#line:57
-                values ['access_token']=O0OO0OO000OOO000O .token #line:58
-        except (TimeoutError ,ConnectionError ,RuntimeError ,KeyError )as OOOO00O0OO000OO00 :#line:60
-            logging .error (OOOO00O0OO000OO00 )#line:61
-        else :#line:62
-            return O0OO0OO000OOO000O .session .post ('https://api.vk.com/method/'+O0OOO00O0O000OOO0 ,values )#line:66
-    def login (OOO00O0O0O00OO000 ):#line:68
-        ""#line:73
-        try :#line:74
-            if os .path .isfile ("cookies"):#line:75
-                with open ('cookies','rb')as O000O0OOOO0O0000O :#line:76
-                    OOO00O0O0O00OO000 .session .cookies .update (pickle .load (O000O0OOOO0O0000O ))#line:77
-            OO000O00OO000O0OO =OOO00O0O0O00OO000 .session .get ('https://m.vk.com/login')#line:79
-            OO0O0OOO000OOO00O =BS (OO000O00OO000O0OO .content ,'lxml')#line:80
-            OOO0O0OOO000OOOO0 =OO0O0OOO000OOO00O .select ('a[class=op_owner]')#line:81
-            if not OOO0O0OOO000OOOO0 :#line:82
-                logging .info ("Updating cookies! Trying to login.")#line:83
-                O00O0OO000OOO0000 =OO0O0OOO000OOO00O .find ('form')['action']#line:84
-                OOO0O00O0OO0OO0O0 =OOO00O0O0O00OO000 .session .post (O00O0OO000OOO0000 ,data ={'email':OOO00O0O0O00OO000 .username ,'pass':OOO00O0O0O00OO000 .password },headers =OOO00O0O0O00OO000 .headers )#line:88
-                OO0O0OOO000OOO00O =BS (OOO0O00O0OO0OO0O0 .content ,'lxml')#line:89
-                OOO0O0OOO000OOOO0 =OO0O0OOO000OOO00O .select ('a[class=op_owner]')#line:90
-                if not OOO0O0OOO000OOOO0 :#line:91
-                    raise KeyError #line:92
-            else :#line:93
-                logging .info ("Logged by cookies!")#line:94
-                logging .info ('Successfully login as: %s',OOO0O0OOO000OOOO0 [0 ]["data-name"])#line:95
-        except (TimeoutError ,ConnectionError ,RuntimeError ,KeyError )as OO0OOO00OOOOOOO0O :#line:96
-            logging .info ('Shit happend. Login fail. %s',OO0OOO00OOOOOOO0O )#line:97
-        else :#line:98
-            OOO00O0O0O00OO000 .get_token ()#line:99
-            with open ('cookies','wb')as O000O0OOOO0O0000O :#line:100
-                pickle .dump (OOO00O0O0O00OO000 .session .cookies ,O000O0OOOO0O0000O )#line:101
-            return OOO0O0OOO000OOOO0 [0 ]["data-name"]#line:102
-    def make_repost (OO0OOOO000OOO0OOO ,O0O00O00000000O00 ):#line:104
-        ""#line:107
-        try :#line:108
-            logging .info (f'Making report: {O0O00O00000000O00}')#line:109
-            O0000O0OOO0OOO000 =OO0OOOO000OOO0OOO .method ('wall.repost',({'object':O0O00O00000000O00 })).json ()#line:110
-        except (TimeoutError ,ConnectionError ,RuntimeError ,KeyError )as OO00OO00O0O00O00O :#line:111
-            logging .error (OO00OO00O0O00O00O )#line:112
-        else :#line:113
-            logging .info (O0000O0OOO0OOO000 )#line:114
-            if 'response'in O0000O0OOO0OOO000 :#line:115
-                OO0OOOO000OOO0OOO .item_id =O0000O0OOO0OOO000 ['response']['post_id']#line:116
-            return O0000O0OOO0OOO000 #line:117
-    def delete_repost (OO0000O0OO0OOO00O ):#line:119
-        ""#line:122
-        try :#line:123
-            O00O0000O00O0O0OO =OO0000O0OO0OOO00O .method ('wall.get',({'owner_id':OO0000O0OO0OOO00O .user_id })).json ()#line:124
-            if 'response'in O00O0000O00O0O0OO :#line:125
-                O00O0000O00O0O0OO =OO0000O0OO0OOO00O .method ('wall.delete',({'owner_id':OO0000O0OO0OOO00O .user_id ,'post_id':OO0000O0OO0OOO00O .item_id })).json ()#line:128
-            logging .info (O00O0000O00O0O0OO )#line:129
-        except (ConnectionError ,RuntimeError ,KeyError )as O00000OO0OO0O0OO0 :#line:130
-            logging .error (O00000OO0OO0O0OO0 )#line:131
-    def get_user_id_to_ban (O00OO0OOOO0O0OO0O ,OO0O000O000O0OOO0 ):#line:133
-        OO0O000OOO0O00OO0 =None #line:134
-        try :#line:135
-            OO0O000O000O0OOO0 .replace ("/","")#line:136
-            O00000O00O0OOOOO0 =O00OO0OOOO0O0OO0O .session .get (f"https://vk.com/{OO0O000O000O0OOO0}")#line:137
-            OO00OO00000O00O0O =BS (O00000O00O0OOOOO0 .text ,'html.parser')#line:139
-            for O0O0000O00OO0O0O0 in OO00OO00000O00O0O .find_all ("a",attrs ={"class":"BtnStack__btn button wide_button acceptFriendBtn Btn Btn_theme_regular"}):#line:141
-                OO0O000OOO0O00OO0 =O0O0000O00OO0O0O0 ['data-uid']#line:142
-                break #line:143
-            if OO0O000OOO0O00OO0 is None :#line:147
-                OO0O000OOO0O00OO0 =O00OO0OOOO0O0OO0O .method ('users.get',({'user_ids':OO0O000O000O0OOO0 })).json ()#line:148
-                OO0O000OOO0O00OO0 =OO0O000OOO0O00OO0 ['response']['id']#line:149
-        except Exception as O00OOO0OO0OO000OO :#line:150
-            logging .error (O00OOO0OO0OO000OO )#line:151
-        else :#line:152
-            return OO0O000OOO0O00OO0 #line:153
-    def get_user_id (OO00O00OOOOOO0O0O ):#line:155
-        ""#line:158
-        O0000OO0OOO00OOOO =OO00O00OOOOOO0O0O .method ('users.get').json ()#line:159
-        if 'response'in O0000OO0OOO00OOOO :#line:160
-            OO00O00OOOOOO0O0O .user_id =O0000OO0OOO00OOOO ['response'][0 ]['id']#line:161
-            logging .info ("user_id = %s",OO00O00OOOOOO0O0O .user_id )#line:162
-        return OO00O00OOOOOO0O0O .user_id #line:163
-    def get_token (O0OO00O00OOOO0OO0 ):#line:165
-        ""#line:169
-        O00000O000O000O0O =2274003 #line:170
-        OO0OOO0O0000OOO0O ='hHbZxrka2uZ6jB1inYsH'#line:171
-        OOO0OO0O00OO0O00O ={}#line:172
-        OOO00O00000OOO000 =f'https://oauth.vk.com/token?grant_type=password&client_id={O00000O000O000O0O}&client_secret={OO0OOO0O0000OOO0O}&username={O0OO00O00OOOO0OO0.username}&password={O0OO00O00OOOO0OO0.password}&v=5.103&2fa_supported=1'#line:174
-        try :#line:175
-            OOO0OO0O00OO0O00O =requests .get (OOO00O00000OOO000 ).json ()#line:176
-            O0OO00O00OOOO0OO0 .token =OOO0OO0O00OO0O00O ['access_token']#line:177
-        except KeyError as O0OOOO00O0O0000OO :#line:179
-            logging .info ('Didn`t get: %s',O0OOOO00O0O0000OO .args [0 ])#line:180
-            if 'error'in OOO0OO0O00OO0O00O :#line:181
-                logging .info ("Причина: %s",OOO0OO0O00OO0O00O ['error_description'])#line:182
-        except ConnectionError as O0OOOO00O0O0000OO :#line:183
-            logging .error ("Connection error")#line:184
-        else :#line:185
-            O0OO00O00OOOO0OO0 .user_id =O0OO00O00OOOO0OO0 .get_user_id ()#line:186
-            return O0OO00O00OOOO0OO0 .token #line:187
-    def login_likest (O000OOO000O00OO00 ):#line:189
-        ""#line:192
-        OOO0OOOOOO0O00O00 ={}#line:193
-        logging .info ('Trying to login to likest')#line:194
-        try :#line:195
-            OOO0000000OOOO0OO =O000OOO000O00OO00 .session .get ('https://ulogin.ru/auth.php?name=vkontakte')#line:196
-            OOOO00OOO00O0OOOO =BS (OOO0000000OOOO0OO .content ,'lxml')#line:197
-            OO0O0O0O0000OOOOO =OOOO00OOO00O0OOOO .select ('script')#line:198
-            O0000O0O000OO00OO ="token = \'(.+)\'"#line:200
-            if OO0O0O0O0000OOOOO :#line:201
-                OO00O00OO0O0OOOO0 =re .search (O0000O0O000OO00OO ,str (OO0O0O0O0000OOOOO )).group (1 )#line:202
-                logging .info (f'Likest token: {OO00O00OO0O0OOOO0}')#line:203
-            else :#line:204
-                logging .error ("Can`t find <script token=...>")#line:205
-            if OO00O00OO0O0OOOO0 :#line:207
-                OOO0OOOOOO0O00O00 =O000OOO000O00OO00 .session .post ('https://likest.ru/user/login-ulogin/token',headers =O000OOO000O00OO00 .headers ,data ={'token':OO00O00OO0O0OOOO0 })#line:211
-        except (NameError ,KeyError ,Exception )as OOO00O000OOOO00OO :#line:213
-            logging .info ('Failed login likest')#line:214
-            logging .error (OOO00O000OOOO00OO )#line:215
-        else :#line:216
-            logging .info ("Succ logged Likest")#line:217
-            return OOO0OOOOOO0O00O00 .status_code #line:218
-    def get_likes_balance (O0OO0O00O0O0OOO0O ):#line:220
-        ""#line:223
-        try :#line:224
-            OOOOO0000O0OO000O =O0OO0O00O0O0OOO0O .session .get (f'http://likest.ru/api/balance.get',headers =O0OO0O00O0O0OOO0O .headers ).json ()#line:226
-        except (TimeoutError ,ConnectionError ,RuntimeError )as OO00OOO0OO0O00000 :#line:227
-            logging .error (OO00OOO0OO0O00000 )#line:228
-        else :#line:229
-            logging .info ('Likest balance %s',OOOOO0000O0OO000O )#line:230
-            return OOOOO0000O0OO000O #line:231
-    def activate_coupon (OOO0OO0OOOOOO000O ,OOO0OOO0O0OO000O0 ):#line:233
-        ""#line:236
-        try :#line:237
-            O0OOO0O0OO0O00OO0 =OOO0OO0OOOOOO000O .session .post ('http://likest.ru/api/coupons.use',data ={'coupons':str (OOO0OOO0O0OO000O0 )},headers =OOO0OO0OOOOOO000O .headers ).json ()#line:240
-        except (TimeoutError ,ConnectionError ,RuntimeError )as OO0000OO00OO00OO0 :#line:242
-            logging .error (OO0000OO00OO00OO0 )#line:243
-        else :#line:244
-            logging .info ('Result %s',O0OOO0O0OO0O00OO0 )#line:245
-            return O0OOO0O0OO0O00OO0 #line:246
-    def add_likest_task (OOOO00OO00OOO00O0 ,O00O000O00O0OO0OO ,O00OOOO0O00OOO00O ,O0OOO0OOOOOO000OO ,reward =''):#line:248
-        ""#line:252
-        O00OOO0O000O0OOOO ='https://likest.ru/system/ajax'#line:253
-        O0O0OOOO0O00O00O0 =''#line:254
-        try :#line:255
-            if O0OOO0OOOOOO000OO =='l':#line:256
-                OOOO00OOO0O0O00OO =OOOO00OO00OOO00O0 .session .get ('https://likest.ru/buy-likes',headers =OOOO00OO00OOO00O0 .headers )#line:258
-                O0O0OOOO0O00O00O0 ='hpoints_buy_likes_form'#line:259
-                _OO0OOOO0O0OOOOO00 ='Заказать'#line:260
-            else :#line:263
-                OOOO00OOO0O0O00OO =OOOO00OO00OOO00O0 .session .get ('https://likest.ru/reposts/add',headers =OOOO00OO00OOO00O0 .headers )#line:265
-                O0O0OOOO0O00O00O0 ='hpoints_reposts_add_form'#line:266
-                _OO0OOOO0O0OOOOO00 ='Получить репосты'#line:267
-            O00O00O0OO0O00OOO =BS (OOOO00OOO0O0O00OO .content ,'lxml')#line:269
-            O0O00OOOO000OOO00 =O00O00O0OO0O00OOO .select ('input[name=form_build_id]')#line:270
-            O000O0OOO0O0O0OOO =O00O00O0OO0O00OOO .select ('input[name=form_token]')#line:271
-            O0O00OOOO000OOO00 =str (O0O00OOOO000OOO00 ).split ('"')[5 ]#line:273
-            O000O0OOO0O0O0OOO =str (O000O0OOO0O0O0OOO ).split ('"')[5 ]#line:274
-            OO00O0O000O00O000 ={"title":O00OOOO0O00OOO00O ,"link":O00OOOO0O00OOO00O ,"reward":reward ,"amount":O00O000O00O0OO0OO ,"sex":"0","country":"0","age_min":"0","age_max":"255","friends_min":"0","lim_5":"0","lim_30":"0","lim_60":"0","sleepy_factor":"0","form_build_id":O0O00OOOO000OOO00 ,"form_token":O000O0OOO0O0O0OOO ,"form_id":O0O0OOOO0O00O00O0 ,"_triggering_element_name":"op","_triggering_element_value":_OO0OOOO0O0OOOOO00 }#line:295
-            if O0OOO0OOOOOO000OO =='l':#line:297
-                OOOO00OO00OOO00O0 .session .head ('https://likest.ru/buy-likes')#line:298
-            else :#line:299
-                OOOO00OO00OOO00O0 .session .head ('https://likest.ru/reposts/add')#line:300
-            OOOOO0OO0O0O000O0 =OOOO00OO00OOO00O0 .session .post (O00OOO0O000O0OOOO ,data =OO00O0O000O00O000 ,headers =OOOO00OO00OOO00O0 .headers )#line:303
-            logging .info (OOOOO0OO0O0O000O0 )#line:304
-        except (ConnectionError ,TimeoutError ,ValueError ,RuntimeError )as OO0OO0OO0OO0O0O0O :#line:306
-            logging .error (OO0OO0OO0OO0O0O0O )#line:307
-        else :#line:308
-            logging .info ('Task added!!!!')#line:309
-    def get_likes_list (O0O0OO00O00OO0000 ):#line:311
-        try :#line:312
-            O000O00O0OOO0O0OO ="https://vk.com/wkview.php"#line:313
-            OOO0O0O0OO0O00OOO ={"act":"show","al":1 ,"loc":f"wall{O0O0OO00O00OO0000.user_id}_{O0O0OO00O00OO0000.item_id}","location_owner_id":O0O0OO00O00OO0000 .user_id ,"w":f"likes/wall{O0O0OO00O00OO0000.user_id}_{O0O0OO00O00OO0000.item_id}"}#line:320
-            OO0O0O0O0000OOOO0 =[]#line:321
-            OOO0O00O000OO0O00 =requests .post (O000O00O0OOO0O0OO ,OOO0O0O0OO0O00OOO )#line:322
-            OOO0O00O000OO0O00 =OOO0O00O000OO0O00 .text .replace ("\\","")#line:323
-            O0O0O0O000OO000OO =BS (OOO0O00O000OO0O00 ,'html.parser')#line:324
-            for O0000OO000O000000 in O0O0O0O000OO000OO .find_all ("a",attrs ={"class":"fans_fan_lnk"}):#line:326
-                OO0O0O0O0000OOOO0 .append (O0000OO000O000000 ["href"])#line:327
-        except Exception as OOOO00OOOO00O00O0 :#line:328
-            logging .error (OOOO00OOOO00O00O0 )#line:329
-        else :#line:330
-            return OO0O0O0O0000OOOO0 #line:331
-    def ban_user_report (O00O0O000OOO0OO0O ):#line:333
-        ""#line:336
-        O0OO0O0O00O0OO00O =[]#line:337
-        try :#line:338
-            O0OO0O0O00O0OO00O =O00O0O000OOO0OO0O .get_likes_list ()#line:339
-        except KeyError as O0OO0000OOOOOOOOO :#line:340
-            logging .error (O0OO0000OOOOOOOOO )#line:341
-        for OOO00OO0O0000OO0O in O0OO0O0O00O0OO00O :#line:343
-            if "/id"not in OOO00OO0O0000OO0O :#line:344
-                OOO00OO0O0000OO0O =O00O0O000OOO0OO0O .get_user_id_to_ban (OOO00OO0O0000OO0O )#line:345
-            OOO00OO0O0000OO0O =OOO00OO0O0000OO0O .replace ("/id","")#line:346
-            OOOO0O0O000O0O0O0 ={'act':'spam','al':'1','mid':OOO00OO0O0000OO0O ,'object':'wall'+str (O00O0O000OOO0OO0O .user_id )+'_'+str (O00O0O000OOO0OO0O .item_id )}#line:352
-            OOOO000O00OOOOOOO =O00O0O000OOO0OO0O .session .post ('https://vk.com/like.php',data =OOOO0O0O000O0O0O0 )#line:355
-            O0OOOO0O0OO00O0OO =re .findall ('hash: \'(?:[a-zA-Z]|[0-9])+',str (OOOO000O00OOOOOOO .text ))[0 ]#line:356
-            O0OOOO0O0OO00O0OO =O0OOOO0O0OO00O0OO .replace ('hash: \'','')#line:357
-            O0O0OO0OO0O00OO0O =O0OOOO0O0OO00O0OO .replace ('"','')#line:358
-            OOOO0O0O000O0O0O0 ={'act':'do_spam','al':'1','hash':O0O0OO0OO0O00OO0O ,'mid':OOO00OO0O0000OO0O ,'object':'wall'+str (O00O0O000OOO0OO0O .user_id )+'_'+str (O00O0O000OOO0OO0O .item_id )}#line:366
-            O00O0O000OOO0OO0O .session .post ('https://vk.com/like.php',data =OOOO0O0O000O0O0O0 )#line:369
-            O00O0O000OOO0OO0O .banned_users .append (OOO00OO0O0000OO0O )#line:370
-        time .sleep (0.1 )#line:371
-    def unban_users (OOO0O00000O0O0O0O ):#line:373
-        O0OO0OO00000OO000 =OOO0O00000O0O0O0O .session .post ('https://vk.com/settings?act=blacklist')#line:374
-        O0O0OO0OOO000OOOO =re .findall (f'Settings.delFromBl\((?:[0-9]+), \'(?:[a-zA-Z]|[0-9])+',str (O0OO0OO00000OO000 .text ))#line:376
-        for O0OOO00O0OOO0000O in O0O0OO0OOO000OOOO :#line:378
-            O0OOO00O0OOO0000O =O0OOO00O0OOO0000O .replace (f'Settings.delFromBl(','').replace (" \\","").replace ("'","").replace (" ","").split (",")#line:379
-            OO000O00OOOOOOOOO =O0OOO00O0OOO0000O [0 ]#line:380
-            OO000O0000OO00OOO =O0OOO00O0OOO0000O [1 ]#line:381
-            O0OO0OOOO000000O0 ={'act':'a_del_from_bl','al':'1','from':'settings','hash':OO000O0000OO00OOO ,'id':OO000O00OOOOOOOOO }#line:389
-            print (O0OO0OOOO000000O0 )#line:390
-            OOO0O00000O0O0O0O .session .post ('https://vk.com/al_settings.php',data =O0OO0OOOO000000O0 )#line:392
-    def ban_users (O0OO00000O0OOO0O0 ):#line:394
-        ""#line:397
-        OOOO000O0OOOO00OO =[]#line:398
-        try :#line:399
-            OO0O0OOOO000OO0OO =O0OO00000O0OOO0O0 .method ('likes.getList',({'owner_id':O0OO00000O0OOO0O0 .user_id ,'item_id':O0OO00000O0OOO0O0 .item_id ,'type':'post'})).json ()#line:404
-            logging .info (OO0O0OOOO000OO0OO )#line:406
-            if 'response'in OO0O0OOOO000OO0OO :#line:407
-                if OO0O0OOOO000OO0OO ['response']['count']!=0 :#line:408
-                    logging .info (OO0O0OOOO000OO0OO )#line:409
-                    OOOO000O0OOOO00OO =OO0O0OOOO000OO0OO ['response']['items']#line:410
-            elif 'error'in OO0O0OOOO000OO0OO :#line:411
-                return OO0O0OOOO000OO0OO #line:412
-        except KeyError as OO0O00OOO000O000O :#line:414
-            logging .error (OO0O00OOO000O000O )#line:415
-            logging .error (OO0O0OOOO000OO0OO )#line:416
-        for O00O000O0OOOOOO00 in OOOO000O0OOOO00OO :#line:418
-            O0OOOOO000O0OOOOO ={'act':'spam','al':'1','mid':O00O000O0OOOOOO00 ,'object':'wall'+str (O0OO00000O0OOO0O0 .user_id )+'_'+str (O0OO00000O0OOO0O0 .item_id )}#line:424
-            O00OO00OOOO0OO00O =O0OO00000O0OOO0O0 .session .post ('https://vk.com/like.php',data =O0OOOOO000O0OOOOO )#line:427
-            O0OO00000OOOO00OO =re .findall ('hash: \'(?:[a-zA-Z]|[0-9])+',str (O00OO00OOOO0OO00O .text ))[0 ]#line:428
-            O0OO00000OOOO00OO =O0OO00000OOOO00OO .replace ('hash: \'','')#line:429
-            O000O0OO0OOO0O00O =O0OO00000OOOO00OO .replace ('"','')#line:430
-            O0OOOOO000O0OOOOO ={'act':'do_spam','al':'1','hash':O000O0OO0OOO0O00O ,'mid':O00O000O0OOOOOO00 ,'object':'wall'+str (O0OO00000O0OOO0O0 .user_id )+'_'+str (O0OO00000O0OOO0O0 .item_id )}#line:438
-            O0OO00000O0OOO0O0 .session .post ('https://vk.com/like.php',data =O0OOOOO000O0OOOOO )#line:441
-        for O00O000O0OOOOOO00 in OOOO000O0OOOO00OO :#line:443
-            O00OO00OOOO0OO00O =requests .get ('https://api.vk.com/method/account.unban?access_token={self.token}&owner_id={user}&v=5.103').json ()#line:444
-            logging .info (O00OO00OOOO0OO00O )#line:445
-            time .sleep (0.6 )#line:446
-        time .sleep (1 )#line:447
-        OOOO000O0OOOO00OO =[]#line:448
-    def get_data_from_link (OO0OOO00OO00OOOOO ,OOOO0OOO0000OOO00 ):#line:450
-        ""#line:453
-        try :#line:454
-            O0OOOOO0O00OO0O00 =(re .findall ('wall-?(.+)_(\\d+)',OOOO0OOO0000OOO00 ))#line:455
-            if not O0OOOOO0O00OO0O00 :#line:456
-                raise IndexError #line:457
-        except IndexError as O0O0O0000OO0OOO00 :#line:458
-            logging .error ("Invalid url! %s",O0O0O0000OO0OOO00 )#line:459
-        else :#line:460
-            OO0OOO00OO00OOOOO .item_id =O0OOOOO0O00OO0O00 [0 ][1 ]#line:461
-            return O0OOOOO0O00OO0O00 [0 ]#line:462
-def save_data_to_file (**O000000000O00O00O ):#line:465
-    ""#line:469
-    try :#line:470
-        OO000OOOO0000OO0O ={}#line:471
-        with open ('data.txt','r+')as O0O0O0O00O0O00O00 :#line:472
-            OO000OOOO0000OO0O =json .load (O0O0O0O00O0O00O00 )#line:473
-        for O0O00O00000OO00O0 in O000000000O00O00O :#line:475
-            OO000OOOO0000OO0O [O0O00O00000OO00O0 ]=O000000000O00O00O [O0O00O00000OO00O0 ]#line:476
-        with open ('data.txt','w+')as O0O0O0O00O0O00O00 :#line:478
-            json .dump (OO000OOOO0000OO0O ,O0O0O0O00O0O00O00 )#line:479
-        return OO000OOOO0000OO0O #line:481
-    except KeyError as OOO0OOO0O0O000O00 :#line:482
-        if OOO0OOO0O0O000O00 .args [0 ]in ['link','login','password','token']:#line:483
-            logging .info ('Cannot find: %s',OOO0OOO0O0O000O00 .args [0 ])#line:484
-    except IOError as OOO0OOO0O0O000O00 :#line:486
-        logging .info (OOO0OOO0O0O000O00 )#line:487
-def load_data_from_file ():#line:490
-    ""#line:494
-    OOO00OOOOOO00OO0O ={}#line:495
-    try :#line:496
-        if not os .path .exists ('data.txt'):#line:497
-            with open ('data.txt','w')as O000OO00OOOO000OO :#line:498
-                O000OO00OOOO000OO .write ('{}')#line:499
-        with open ('data.txt')as O00OO00OOOOOO0O00 :#line:501
-            OO000OO0OO000O00O =json .load (O00OO00OOOOOO0O00 )#line:502
-        if 'login'in OO000OO0OO000O00O :#line:504
-            OOO00OOOOOO00OO0O ['login']=OO000OO0OO000O00O ['login']#line:505
-        if 'password'in OO000OO0OO000O00O :#line:506
-            OOO00OOOOOO00OO0O ['password']=OO000OO0OO000O00O ['password']#line:507
-        if 'token'in OO000OO0OO000O00O :#line:508
-            OOO00OOOOOO00OO0O ['token']=OO000OO0OO000O00O ['token']#line:509
-        if 'url'in OO000OO0OO000O00O :#line:510
-            OOO00OOOOOO00OO0O ['url']=OO000OO0OO000O00O ['url']#line:511
-        if 'user_id'in OO000OO0OO000O00O :#line:512
-            OOO00OOOOOO00OO0O ['user_id']=OO000OO0OO000O00O ['user_id']#line:513
-    except KeyError as O0O0OOO00O0OO0OOO :#line:515
-        if O0O0OOO00O0OO0OOO .args [0 ]in ['link','login','password','token']:#line:516
-            logging .error ('Cannot find: %s',O0O0OOO00O0OO0OOO .args [0 ])#line:517
-    except Exception as O0O0OOO00O0OO0OOO :#line:518
-        raise O0O0OOO00O0OO0OOO #line:519
-    else :#line:520
-        return OOO00OOOOOO00OO0O #line:521
+import multiprocessing as mp #line:6
+import re #line:7
+import sys #line:8
+import time #line:9
+import random #line:10
+import string #line:11
+from multiprocessing import Pool #line:12
+import requests #line:14
+from bs4 import BeautifulSoup as BS #line:15
+with open ('mylog.log','w')as f :#line:20
+    f .writelines ('')#line:21
+logging .basicConfig (format =u'%(filename)s[LINE:%(lineno)-2s]# %(levelname)-8s [%(asctime)s] %(message)s',level =logging .DEBUG ,filename =u'mylog.log')#line:24
+class User :#line:28
+    ""#line:29
+    def __init__ (O0000000OO0O00O0O ,O000OO00OO00OO0O0 ,OOOOOOOO0O000O000 ):#line:31
+        O0000000OO0O00O0O .username =O000OO00OO00OO0O0 #line:32
+        O0000000OO0O00O0O .password =OOOOOOOO0O000O000 #line:33
+        O0000000OO0O00O0O .banned_users =[]#line:34
+        O0000000OO0O00O0O .token =None #line:35
+        O0000000OO0O00O0O .session =requests .Session ()#line:36
+        O0000000OO0O00O0O .headers ={'User-Agent':'Mozilla/5.0 (X11; Linux x86_64)' ' AppleWebKit/537.36 (KHTML, like Gecko)' ' Chrome/79.0.3945.130 Safari/537.36','Accept':'*/*','Accept-Language':'en-US,en;q=0.9,ru-RU;q=0.8,ru;q=0.7','Accept-Encoding':'gzip, deflate, br','Connection':'keep-alive'}#line:45
+        O0000000OO0O00O0O .item_id =None #line:47
+        O0000000OO0O00O0O .user_id =None #line:48
+    def method (O0O0O0OO0OO0OO0O0 ,OO0O0O00000000000 ,values =None ):#line:50
+        ""#line:55
+        try :#line:56
+            if values is None :#line:57
+                values ={}#line:58
+            values ['v']='5.103'#line:59
+            if O0O0O0OO0OO0OO0O0 .token :#line:60
+                values ['access_token']=O0O0O0OO0OO0OO0O0 .token #line:61
+        except (TimeoutError ,ConnectionError ,RuntimeError ,KeyError )as OO0OOO0OOOOO00000 :#line:63
+            logging .error (OO0OOO0OOOOO00000 )#line:64
+        else :#line:65
+            return O0O0O0OO0OO0OO0O0 .session .post ('https://api.vk.com/method/'+OO0O0O00000000000 ,values )#line:69
+    def login (OOOOO0OOOOO00OOOO ):#line:71
+        ""#line:76
+        try :#line:77
+            if os .path .isfile ("cookies"):#line:78
+                with open ('cookies','rb')as O0000O0OOO0OO00OO :#line:79
+                    OOOOO0OOOOO00OOOO .session .cookies .update (pickle .load (O0000O0OOO0OO00OO ))#line:80
+            O000O00O0O0O00O0O =OOOOO0OOOOO00OOOO .session .get ('https://m.vk.com/login')#line:82
+            O0O00OOOOOO0OOO0O =BS (O000O00O0O0O00O0O .content ,'lxml')#line:83
+            O00O0O00OOO00O00O =O0O00OOOOOO0OOO0O .select ('a[class=op_owner]')#line:84
+            if not O00O0O00OOO00O00O :#line:85
+                logging .info ("Updating cookies! Trying to login.")#line:86
+                OO0OOOO0O0O0OOO00 =O0O00OOOOOO0OOO0O .find ('form')['action']#line:87
+                OOO00O0O0OO0000O0 =OOOOO0OOOOO00OOOO .session .post (OO0OOOO0O0O0OOO00 ,data ={'email':OOOOO0OOOOO00OOOO .username ,'pass':OOOOO0OOOOO00OOOO .password },headers =OOOOO0OOOOO00OOOO .headers )#line:91
+                O0O00OOOOOO0OOO0O =BS (OOO00O0O0OO0000O0 .content ,'lxml')#line:92
+                O00O0O00OOO00O00O =O0O00OOOOOO0OOO0O .select ('a[class=op_owner]')#line:93
+                if not O00O0O00OOO00O00O :#line:94
+                    raise KeyError #line:95
+            else :#line:96
+                logging .info ("Logged by cookies!")#line:97
+                logging .info ('Successfully login as: %s',O00O0O00OOO00O00O [0 ]["data-name"])#line:98
+        except (TimeoutError ,ConnectionError ,RuntimeError ,KeyError )as O0O0O0000OOOO0OOO :#line:99
+            logging .error ('Shit happend. Login fail. %s',O0O0O0000OOOO0OOO )#line:100
+        else :#line:101
+            OOOOO0OOOOO00OOOO .get_token ()#line:102
+            with open ('cookies','wb')as O0000O0OOO0OO00OO :#line:103
+                pickle .dump (OOOOO0OOOOO00OOOO .session .cookies ,O0000O0OOO0OO00OO )#line:104
+            return O00O0O00OOO00O00O [0 ]["data-name"]#line:105
+    def make_repost (OO0OO0O0OO00OOO0O ,OO0OO00O0O000OO00 ):#line:107
+        ""#line:110
+        try :#line:111
+            logging .info (f'Making report: {OO0OO00O0O000OO00}')#line:112
+            OOOOO00O00OOOOOOO =OO0OO0O0OO00OOO0O .method ('wall.repost',({'object':OO0OO00O0O000OO00 })).json ()#line:113
+        except (TimeoutError ,ConnectionError ,RuntimeError ,KeyError )as O0OOOO0O00OOOOOO0 :#line:114
+            logging .error (O0OOOO0O00OOOOOO0 )#line:115
+        else :#line:116
+            logging .info (OOOOO00O00OOOOOOO )#line:117
+            if 'response'in OOOOO00O00OOOOOOO :#line:118
+                OO0OO0O0OO00OOO0O .item_id =OOOOO00O00OOOOOOO ['response']['post_id']#line:119
+            return OOOOO00O00OOOOOOO #line:120
+    def delete_repost (OO0000O0OOOO0OO0O ):#line:122
+        ""#line:125
+        try :#line:126
+            OO0O000000O00O00O =OO0000O0OOOO0OO0O .method ('wall.get',({'owner_id':OO0000O0OOOO0OO0O .user_id })).json ()#line:127
+            if 'response'in OO0O000000O00O00O :#line:128
+                OO0O000000O00O00O =OO0000O0OOOO0OO0O .method ('wall.delete',({'owner_id':OO0000O0OOOO0OO0O .user_id ,'post_id':OO0000O0OOOO0OO0O .item_id })).json ()#line:131
+            logging .info (OO0O000000O00O00O )#line:132
+        except (ConnectionError ,RuntimeError ,KeyError )as OOOOOOOO0OO0O0O00 :#line:133
+            logging .error (OOOOOOOO0OO0O0O00 )#line:134
+    def get_user_id_to_ban (O000O0OO0O0OO0OO0 ,O00O00O000OOO0O00 ):#line:136
+        O0OO00OOO0000OO00 =None #line:137
+        try :#line:138
+            O00O00O000OOO0O00 =O00O00O000OOO0O00 .replace ("/","")#line:139
+            O0OOO00000O0000O0 =O000O0OO0O0OO0OO0 .session .get (f"https://vk.com/{O00O00O000OOO0O00}")#line:140
+            O0O000O0OO0OO0O00 =BS (O0OOO00000O0000O0 .text ,'html.parser')#line:141
+            for OOOO0OOOO000OO0O0 in O0O000O0OO0OO0O00 .find_all ("a",attrs ={"class":"BtnStack__btn button wide_button acceptFriendBtn Btn Btn_theme_regular"}):#line:143
+                O0OO00OOO0000OO00 =OOOO0OOOO000OO0O0 ['data-uid']#line:144
+                break #line:145
+            if O0OO00OOO0000OO00 is None :#line:149
+                O0OO00OOO0000OO00 =O000O0OO0O0OO0OO0 .method ('users.get',({'user_ids':O00O00O000OOO0O00 })).json ()#line:150
+                return O0OO00OOO0000OO00 ['response'][0 ]['id']#line:151
+        except Exception as O0O0O0OOOOO00OOO0 :#line:152
+            logging .error (O0O0O0OOOOO00OOO0 )#line:153
+        else :#line:154
+            return O0OO00OOO0000OO00 #line:155
+    def get_user_id (OOO00OOO0OO0O0OOO ):#line:157
+        ""#line:160
+        O0O0O00OOO00O00O0 =OOO00OOO0OO0O0OOO .method ('users.get').json ()#line:161
+        if 'response'in O0O0O00OOO00O00O0 :#line:162
+            OOO00OOO0OO0O0OOO .user_id =O0O0O00OOO00O00O0 ['response'][0 ]['id']#line:163
+            logging .info ("user_id = %s",OOO00OOO0OO0O0OOO .user_id )#line:164
+        return OOO00OOO0OO0O0OOO .user_id #line:165
+    def get_token (OO000OO0OO0OO0OO0 ):#line:167
+        ""#line:171
+        O0OOOOO0000OOO000 =2274003 #line:172
+        OO0O0OO000O0O00O0 ='hHbZxrka2uZ6jB1inYsH'#line:173
+        OOO0OOO00OOO0000O ={}#line:174
+        OO0OOOOOO00000O0O =f'https://oauth.vk.com/token?grant_type=password&client_id={O0OOOOO0000OOO000}&client_secret={OO0O0OO000O0O00O0}&username={OO000OO0OO0OO0OO0.username}&password={OO000OO0OO0OO0OO0.password}&v=5.103&2fa_supported=1'#line:176
+        try :#line:177
+            OOO0OOO00OOO0000O =requests .get (OO0OOOOOO00000O0O ).json ()#line:178
+            OO000OO0OO0OO0OO0 .token =OOO0OOO00OOO0000O ['access_token']#line:179
+        except KeyError as O00OO00O0OOO00OO0 :#line:181
+            logging .info ('Didn`t get: %s',O00OO00O0OOO00OO0 .args [0 ])#line:182
+            if 'error'in OOO0OOO00OOO0000O :#line:183
+                logging .info ("Причина: %s",OOO0OOO00OOO0000O ['error_description'])#line:184
+        except ConnectionError as O00OO00O0OOO00OO0 :#line:185
+            logging .error ("Connection error")#line:186
+        else :#line:187
+            OO000OO0OO0OO0OO0 .user_id =OO000OO0OO0OO0OO0 .get_user_id ()#line:188
+            return OO000OO0OO0OO0OO0 .token #line:189
+    def login_likest (OOOO00OOO0000O000 ):#line:191
+        ""#line:194
+        O000OOOO00O0000O0 ={}#line:195
+        logging .info ('Trying to login to likest')#line:196
+        try :#line:197
+            O00O0OO00OOO0O000 =requests .head ("https://ulogin.ru/auth.php?name=vkontakte")#line:198
+            logging .info (O00O0OO00OOO0O000 .status_code )#line:199
+            if O00O0OO00OOO0O000 .status_code ==500 :#line:200
+                return False #line:201
+            O00OOOO00OOOO0OOO =OOOO00OOO0000O000 .session .get ('https://ulogin.ru/auth.php?name=vkontakte')#line:203
+            OO0000OOOOO0O0O00 =BS (O00OOOO00OOOO0OOO .content ,'lxml')#line:204
+            OO0OOOOOOOOOOO0O0 =OO0000OOOOO0O0O00 .select ('script')#line:205
+            O000O00OO00O00000 ="token = \'(.+)\'"#line:207
+            if OO0OOOOOOOOOOO0O0 :#line:208
+                O0OO0OO00O0000OO0 =re .search (O000O00OO00O00000 ,str (OO0OOOOOOOOOOO0O0 )).group (1 )#line:209
+                logging .info (f'Likest token: {O0OO0OO00O0000OO0}')#line:210
+            else :#line:211
+                logging .error ("Can`t find <script token=...>")#line:212
+            if O0OO0OO00O0000OO0 :#line:214
+                O000OOOO00O0000O0 =OOOO00OOO0000O000 .session .post ('https://likest.ru/user/login-ulogin/token',headers =OOOO00OOO0000O000 .headers ,data ={'token':O0OO0OO00O0000OO0 })#line:218
+        except (NameError ,KeyError ,Exception )as OO0OOO0O0O000000O :#line:220
+            logging .info ('Failed login likest')#line:221
+            logging .error (OO0OOO0O0O000000O )#line:222
+            return False #line:223
+        else :#line:224
+            logging .info ("Succ logged Likest")#line:225
+            return True #line:226
+    def get_likes_balance (O0O0OOO0OOOOOOO00 ):#line:228
+        ""#line:231
+        try :#line:232
+            O00O0OOO0O0000OOO =O0O0OOO0OOOOOOO00 .session .get (f'http://likest.ru/api/balance.get',headers =O0O0OOO0OOOOOOO00 .headers ).json ()#line:234
+        except (TimeoutError ,ConnectionError ,RuntimeError )as O0O00OOO00000OO0O :#line:235
+            logging .error (O0O00OOO00000OO0O )#line:236
+        else :#line:237
+            logging .info ('Likest balance %s',O00O0OOO0O0000OOO )#line:238
+            return O00O0OOO0O0000OOO #line:239
+    def activate_coupon (OOOOO00OO0OOO0O00 ,OO00O00OOOO000O0O ):#line:241
+        ""#line:244
+        try :#line:245
+            O00OO0OO000O0OO0O =OOOOO00OO0OOO0O00 .session .post ('http://likest.ru/api/coupons.use',data ={'coupons':str (OO00O00OOOO000O0O )},headers =OOOOO00OO0OOO0O00 .headers ).json ()#line:248
+        except (TimeoutError ,ConnectionError ,RuntimeError )as O0OO0O000O00O0O0O :#line:250
+            logging .error (O0OO0O000O00O0O0O )#line:251
+        else :#line:252
+            logging .info ('Result %s',O00OO0OO000O0OO0O )#line:253
+            return O00OO0OO000O0OO0O #line:254
+    def add_likest_task (O0OO0O00OO0O00O0O ,OOOOOO000OO000O0O ,OO00O0OO000OOO000 ,OOOOO0OO0OO00OOO0 ,reward =''):#line:256
+        ""#line:260
+        O00OO0OOOOOO00OO0 ='https://likest.ru/system/ajax'#line:261
+        OOO0O00000O00OO00 =''#line:262
+        try :#line:263
+            if OOOOO0OO0OO00OOO0 =='l':#line:264
+                O0OOO0O0OOOOOOOOO =O0OO0O00OO0O00O0O .session .get ('https://likest.ru/buy-likes',headers =O0OO0O00OO0O00O0O .headers )#line:266
+                OOO0O00000O00OO00 ='hpoints_buy_likes_form'#line:267
+                _OO000O0OO0OOOOO0O ='Заказать'#line:268
+            else :#line:271
+                O0OOO0O0OOOOOOOOO =O0OO0O00OO0O00O0O .session .get ('https://likest.ru/reposts/add',headers =O0OO0O00OO0O00O0O .headers )#line:273
+                OOO0O00000O00OO00 ='hpoints_reposts_add_form'#line:274
+                _OO000O0OO0OOOOO0O ='Получить репосты'#line:275
+            OO00OOO00OOO0OO0O =BS (O0OOO0O0OOOOOOOOO .content ,'lxml')#line:277
+            O000O00OOO0O0OOO0 =OO00OOO00OOO0OO0O .select ('input[name=form_build_id]')#line:278
+            O0O000O00OO0O00O0 =OO00OOO00OOO0OO0O .select ('input[name=form_token]')#line:279
+            O000O00OOO0O0OOO0 =str (O000O00OOO0O0OOO0 ).split ('"')[5 ]#line:281
+            O0O000O00OO0O00O0 =str (O0O000O00OO0O00O0 ).split ('"')[5 ]#line:282
+            OOOO0OOO0OO000O0O ={"title":OO00O0OO000OOO000 ,"link":OO00O0OO000OOO000 ,"reward":reward ,"amount":OOOOOO000OO000O0O ,"sex":"0","country":"0","age_min":"0","age_max":"255","friends_min":"0","lim_5":"0","lim_30":"0","lim_60":"0","sleepy_factor":"0","form_build_id":O000O00OOO0O0OOO0 ,"form_token":O0O000O00OO0O00O0 ,"form_id":OOO0O00000O00OO00 ,"_triggering_element_name":"op","_triggering_element_value":_OO000O0OO0OOOOO0O }#line:303
+            if OOOOO0OO0OO00OOO0 =='l':#line:305
+                O0OO0O00OO0O00O0O .session .head ('https://likest.ru/buy-likes')#line:306
+            else :#line:307
+                O0OO0O00OO0O00O0O .session .head ('https://likest.ru/reposts/add')#line:308
+            O00O0OOO0OOO00OO0 =O0OO0O00OO0O00O0O .session .post (O00OO0OOOOOO00OO0 ,data =OOOO0OOO0OO000O0O ,headers =O0OO0O00OO0O00O0O .headers )#line:311
+            logging .info (O00O0OOO0OOO00OO0 )#line:312
+        except (ConnectionError ,TimeoutError ,ValueError ,RuntimeError )as OO00OOOOO00000O0O :#line:314
+            logging .error (OO00OOOOO00000O0O )#line:315
+        else :#line:316
+            logging .info ('Task added!!!!')#line:317
+    def get_likes_list (O0O00OOOO0OO00OOO ):#line:319
+        try :#line:320
+            O0000O0000OO0OO00 ="https://vk.com/wkview.php"#line:321
+            O0000OO0O00O0OO0O ={"act":"show","al":1 ,"loc":f"wall{O0O00OOOO0OO00OOO.user_id}_{O0O00OOOO0OO00OOO.item_id}","location_owner_id":O0O00OOOO0OO00OOO .user_id ,"w":f"likes/wall{O0O00OOOO0OO00OOO.user_id}_{O0O00OOOO0OO00OOO.item_id}"}#line:328
+            OO000OOO00O0O0O0O =[]#line:329
+            O0OOO0O0O0O0OO00O =requests .post (O0000O0000OO0OO00 ,O0000OO0O00O0OO0O )#line:330
+            O0OOO0O0O0O0OO00O =O0OOO0O0O0O0OO00O .text .replace ("\\","")#line:331
+            O0O00OO0OO0O0O000 =BS (O0OOO0O0O0O0OO00O ,'html.parser')#line:332
+            for OOO00000OO00000O0 in O0O00OO0OO0O0O000 .find_all ("a",attrs ={"class":"fans_fan_ph"}):#line:334
+                OO000OOO00O0O0O0O .append (OOO00000OO00000O0 ["href"])#line:335
+        except Exception as OO0OO0O00O00O00OO :#line:336
+            logging .error (OO0OO0O00O00O00OO )#line:337
+        else :#line:338
+            return OO000OOO00O0O0O0O #line:339
+    def ban_user_report (O0000OOO00O00O0O0 ):#line:341
+        ""#line:344
+        O00O00OO0OOOOOO0O =[]#line:345
+        try :#line:346
+            O00O00OO0OOOOOO0O =O0000OOO00O00O0O0 .get_likes_list ()#line:347
+        except KeyError as OO000O00OOO0OOOO0 :#line:348
+            logging .error (OO000O00OOO0OOOO0 )#line:349
+        try :#line:350
+            if not O00O00OO0OOOOOO0O :#line:351
+                return None #line:352
+            for OOOOO0OO00O0O0OO0 in O00O00OO0OOOOOO0O :#line:353
+                if re .match ('id([0-9])+',OOOOO0OO00O0O0OO0 )is None :#line:354
+                    OOOOO0OO00O0O0OO0 =O0000OOO00O00O0O0 .get_user_id_to_ban (OOOOO0OO00O0O0OO0 )#line:355
+                else :#line:357
+                    OOOOO0OO00O0O0OO0 =OOOOO0OO00O0O0OO0 .replace ("/id","")#line:358
+                O00000OOO00O0OO0O ={'act':'spam','al':'1','mid':OOOOO0OO00O0O0OO0 ,'object':'wall'+str (O0000OOO00O00O0O0 .user_id )+'_'+str (O0000OOO00O00O0O0 .item_id )}#line:364
+                OOOO00000O00O0000 =O0000OOO00O00O0O0 .session .post ('https://vk.com/like.php',data =O00000OOO00O0OO0O )#line:367
+                O0OO0O0OOO0000000 =re .findall ('hash: \'(?:[a-zA-Z]|[0-9])+',str (OOOO00000O00O0000 .text ))[0 ]#line:369
+                O0OO0O0OOO0000000 =O0OO0O0OOO0000000 .replace ('hash: \'','')#line:370
+                O0000O0O00O0OO000 =O0OO0O0OOO0000000 .replace ('"','')#line:371
+                O00000OOO00O0OO0O ={'act':'do_spam','al':'1','hash':O0000O0O00O0OO000 ,'mid':OOOOO0OO00O0O0OO0 ,'object':'wall'+str (O0000OOO00O00O0O0 .user_id )+'_'+str (O0000OOO00O00O0O0 .item_id )}#line:379
+                O0000OOO00O00O0O0 .session .post ('https://vk.com/like.php',data =O00000OOO00O0OO0O )#line:382
+                O0000OOO00O00O0O0 .banned_users .append (OOOOO0OO00O0O0OO0 )#line:383
+        except Exception as O0O0O00O000OO0000 :#line:384
+            logging .log (O0O0O00O000OO0000 )#line:385
+        O00O00OO0OOOOOO0O =[]#line:386
+        time .sleep (0.4 )#line:387
+    def unban_users (OO0O00O0OO0O00O0O ):#line:389
+        O0000O0000OO0OO0O =OO0O00O0OO0O00O0O .session .post ('https://vk.com/settings?act=blacklist')#line:390
+        OOO000000O000O000 =re .findall (f'Settings.delFromBl\((?:[0-9]+), \'(?:[a-zA-Z]|[0-9])+',str (O0000O0000OO0OO0O .text ))#line:392
+        for OOOO00O00O0OO000O in OOO000000O000O000 :#line:394
+            OOOO00O00O0OO000O =OOOO00O00O0OO000O .replace (f'Settings.delFromBl(','').replace (" \\","").replace ("'","").replace (" ","").split (",")#line:395
+            OO0000OO00O0OO0OO =OOOO00O00O0OO000O [0 ]#line:396
+            O0O0O0OOO00OO00OO =OOOO00O00O0OO000O [1 ]#line:397
+            OOO0OOOO00O0O0OO0 ={'act':'a_del_from_bl','al':'1','from':'settings','hash':O0O0O0OOO00OO00OO ,'id':OO0000OO00O0OO0OO }#line:405
+            print (OOO0OOOO00O0O0OO0 )#line:406
+            OO0O00O0OO0O00O0O .session .post ('https://vk.com/al_settings.php',data =OOO0OOOO00O0O0OO0 )#line:408
+    def get_data_from_link (O0000OOOOO0000O0O ,O000O000OO000OOOO ):#line:410
+        ""#line:413
+        try :#line:414
+            OO0O00O00OO0O0O00 =(re .findall ('wall-?(.+)_(\\d+)',O000O000OO000OOOO ))#line:415
+            if not OO0O00O00OO0O0O00 :#line:416
+                raise IndexError #line:417
+        except IndexError as O00OOO00OO00O0O0O :#line:418
+            logging .error ("Invalid url! %s",O00OOO00OO00O0O0O )#line:419
+        else :#line:420
+            O0000OOOOO0000O0O .item_id =OO0O00O00OO0O0O00 [0 ][1 ]#line:421
+            return OO0O00O00OO0O0O00 [0 ]#line:422
+def save_data_to_file (**OOOOO00O000O0OO00 ):#line:425
+    ""#line:429
+    try :#line:430
+        OO0000OOO0O0O0O0O ={}#line:431
+        with open ('data.txt','r+')as O0O0OOO0O0O0O0000 :#line:432
+            OO0000OOO0O0O0O0O =json .load (O0O0OOO0O0O0O0000 )#line:433
+        for OO0O0O00OOOOO0OOO in OOOOO00O000O0OO00 :#line:435
+            OO0000OOO0O0O0O0O [OO0O0O00OOOOO0OOO ]=OOOOO00O000O0OO00 [OO0O0O00OOOOO0OOO ]#line:436
+        with open ('data.txt','w+')as O0O0OOO0O0O0O0000 :#line:438
+            json .dump (OO0000OOO0O0O0O0O ,O0O0OOO0O0O0O0000 )#line:439
+        return OO0000OOO0O0O0O0O #line:441
+    except KeyError as O00O0OOO0O0OO0OO0 :#line:442
+        if O00O0OOO0O0OO0OO0 .args [0 ]in ['link','login','password','token']:#line:443
+            logging .info ('Cannot find: %s',O00O0OOO0O0OO0OO0 .args [0 ])#line:444
+    except IOError as O00O0OOO0O0OO0OO0 :#line:446
+        logging .info (O00O0OOO0O0OO0OO0 )#line:447
+def load_data_from_file ():#line:450
+    ""#line:454
+    OO00000000OO000OO ={}#line:455
+    try :#line:456
+        if not os .path .exists ('data.txt'):#line:457
+            with open ('data.txt','w')as O0O000O000O0OO00O :#line:458
+                O0O000O000O0OO00O .write ('{}')#line:459
+        with open ('data.txt')as OOOOOO0O000O00OOO :#line:461
+            OO000000OOO0OO0OO =json .load (OOOOOO0O000O00OOO )#line:462
+        if 'login'in OO000000OOO0OO0OO :#line:464
+            OO00000000OO000OO ['login']=OO000000OOO0OO0OO ['login']#line:465
+        if 'password'in OO000000OOO0OO0OO :#line:466
+            OO00000000OO000OO ['password']=OO000000OOO0OO0OO ['password']#line:467
+        if 'token'in OO000000OOO0OO0OO :#line:468
+            OO00000000OO000OO ['token']=OO000000OOO0OO0OO ['token']#line:469
+        if 'url'in OO000000OOO0OO0OO :#line:470
+            OO00000000OO000OO ['url']=OO000000OOO0OO0OO ['url']#line:471
+        if 'user_id'in OO000000OOO0OO0OO :#line:472
+            OO00000000OO000OO ['user_id']=OO000000OOO0OO0OO ['user_id']#line:473
+    except KeyError as OO0OOOO00OOOO0O0O :#line:475
+        if OO0OOOO00OOOO0O0O .args [0 ]in ['link','login','password','token']:#line:476
+            logging .error ('Cannot find: %s',OO0OOOO00OOOO0O0O .args [0 ])#line:477
+    except Exception as OO0OOOO00OOOO0O0O :#line:478
+        raise OO0OOOO00OOOO0O0O #line:479
+    else :#line:480
+        return OO00000000OO000OO #line:481
