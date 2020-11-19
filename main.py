@@ -16,8 +16,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QThread
 from PyQt5.QtWidgets import QMessageBox
 
-from ui_py.test_ui import Ui_MainWindow
-from logic import load_data_from_file, User, save_data_to_file
+from ui_py.main import Ui_MainWindow
+from vk_worker import load_data_from_file, User, save_data_to_file
 from ui_py.error_ui import Ui_Error
 from ui_py.hwid import Ui_Hwid
 from bs4 import BeautifulSoup as BS
@@ -26,7 +26,6 @@ from PyQt5.QtCore import (QCoreApplication, QObject, QRunnable, QThread,
 
 
 def resource_path(relative_path):
-    """ Get absolute path to resource, works for dev and for PyInstaller """
     """ Get absolute path to resource, works for dev and for PyInstaller """
     base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
     return os.path.join(base_path, relative_path)
@@ -73,14 +72,12 @@ class MyyWindow(QtWidgets.QMainWindow):
         self.m_thread = None
         self.current_window = None
         self.ui = Ui_MainWindow()
+        self.err_dialog = ErrorDialog()
         self.ui.setupUi(self)
         self.ui.stackedWidget.setCurrentIndex(0)
         # error dialog
-        # self.setStyleSheet(css)
-        self.err_dialog = ErrorDialog()
         self.data_result = None
         self.m_modbus_worker = None
-        # подключение клик-сигнал к слоту btnClicked
         self.ui.LikesButton.clicked.connect(self.set_page_view_likes)
         self.ui.LogsButton.clicked.connect(self.set_page_view_logs)
         self.ui.VkLoginButton.clicked.connect(self.set_page_view_vklogin)
@@ -90,7 +87,7 @@ class MyyWindow(QtWidgets.QMainWindow):
         self.ui.SaveUrlButton.clicked.connect(self.save_url)
         self.ui.SaveUrlButton_R.clicked.connect(self.save_url)
 
-        # save coupong
+        # save coupon
         self.ui.SaveCouponButton.clicked.connect(self.save_coupon)
         # get balance button
         self.ui.getBalance.clicked.connect(self.get_likest_balance)
@@ -101,7 +98,6 @@ class MyyWindow(QtWidgets.QMainWindow):
         log_handler.setFormatter(
             logging.Formatter('%(filename)s[LINE:%(lineno)-4s]'
                               ' #%(levelname)-4s [%(asctime)s]  %(message)s'))
-        logging.getLogger("getmac").setLevel(logging.WARNING)
 
         logging.getLogger().addHandler(log_handler)
 
@@ -110,9 +106,7 @@ class MyyWindow(QtWidgets.QMainWindow):
         self.user_id = None
         self.post_id = None
         self.token = None
-        # self.loading_data()
 
-        # start stop buttons
         self.ui.StopLikes.clicked.connect(self.stop)
         self.ui.StartLikes.clicked.connect(self.start)
 
@@ -207,7 +201,6 @@ class MyyWindow(QtWidgets.QMainWindow):
             self.err_dialog.exec_()
         else:
             logging.info('Starting ban users.')
-            repost_or_like = ''
             reward = None
             if self.current_window == 3:
                 repost_or_like = 'r'
@@ -218,10 +211,10 @@ class MyyWindow(QtWidgets.QMainWindow):
                 repost_count = self.ui.LikesCount.text()
 
             if (self.ui.LikestCheckBox.isChecked() or self.ui.RepostsCheckBox.isChecked()) and self.is_login_likest:
-                like_url = f'https://vk.com/wall{self.user.user_id}_{self.user.item_id}'
-
-                save_data_to_file(url_tolike=like_url, post_id=self.user.item_id)
-                self.user.add_likest_task(likes_count=repost_count, like_url=like_url, repost_like=repost_or_like,
+                save_data_to_file(url_tolike=self.url, post_id=self.user.item_id)
+                self.user.add_likest_task(likes_count=repost_count,
+                                          like_url=self.url,
+                                          repost_like=repost_or_like,
                                           reward=reward)
 
                 if self.current_window == 3:
@@ -280,17 +273,17 @@ class MyyWindow(QtWidgets.QMainWindow):
             self.err_dialog.exec_()
         else:
             if self.current_window == 3:
-                url = self.ui.LabelRepostsUrl.text()
+                self.url = self.ui.LabelRepostsUrl.text()
             else:
-                url = self.ui.LabelLikesUrl.text()
+                self.url = self.ui.LabelLikesUrl.text()
 
-            if url is None:
-                url = self.ui.LabelRepostsUrl.text()
+            if self.url is None:
+                self.url = self.ui.LabelRepostsUrl.text()
 
-            self.data_result = self.user.get_data_from_link(url)
+            self.data_result = self.user.get_data_from_link(self.url)
             data_from_db = {}
 
-            if not url:
+            if not self.url:
                 self.ui.ResultSaveUrl.setStyleSheet("color: rgb(195, 15, 18);")
                 self.ui.ResultSaveUrl.setText("Enter Url")
                 if self.current_window == 3:
@@ -304,7 +297,7 @@ class MyyWindow(QtWidgets.QMainWindow):
                     self.ui.ResultSaveUrl_R.setText("Invalid url.")
             else:
                 # repost_result = self.user.make_repost(url)
-                data_from_db = save_data_to_file(url_tolike=url, post_id=self.data_result[1])
+                data_from_db = save_data_to_file(url_tolike=self.url, post_id=self.data_result[1])
                 self.ui.ResultSaveUrl.setStyleSheet("color: rgb(154, 255, 152);")
                 self.ui.ResultSaveUrl.setText("Saved")
                 if self.current_window == 3:
@@ -389,14 +382,12 @@ class ModbusWorker(QThread):
     def do_work(self):
         try:
             while not QtCore.QThread.currentThread().isInterruptionRequested():
-                # res = self.user.ban_user_report()
                 self.user.ban_user_report()
         except Exception as e:
             logging.log(e)
             self.user.delete_repost()
 
     def stop(self):
-
         self.wait()
 
 
@@ -406,7 +397,7 @@ def get_hwid():
 
 def check_hwid():
     response = requests.get("https://pastebin.com/raw/GFQrRHcS")
-    user_hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
+    user_hwid = get_hwid()
     if user_hwid in response.text:
         return True
     else:
@@ -418,8 +409,10 @@ if __name__ == '__main__':
         if check_hwid():
             app = QtWidgets.QApplication([])
             app.setStyle('Windows')
-            # app.setQuitOnLastWindowClosed(True)
+
+            app.setQuitOnLastWindowClosed(True)
             application = MyyWindow()
+            app.setStyleSheet('QMainWindow{background-color: black;border: 1px solid black;}')
             application.show()
             if application.is_login_likest is False and 'login' in application.data:
                 application.err_dialog.set_text(f"Unsuccessful login likest.")
