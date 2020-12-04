@@ -12,6 +12,7 @@ http://pyob.oxyry.com
 
 
 pyuic5 name.ui -o name.py
+pyrcc5 files.qrc -o resources.py
 
 
 
