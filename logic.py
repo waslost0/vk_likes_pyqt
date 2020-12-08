@@ -6,18 +6,16 @@ import pickle
 import re
 import time
 
+from itertools import product
 
 import requests
 from bs4 import BeautifulSoup as BS
 
-with open('mylog.log', 'w') as f:
+with open('logs.log', 'w') as f:
     f.writelines('')
 
 logging.basicConfig(format=u'%(filename)s[LINE:%(lineno)-2s]# %(levelname)-8s [%(asctime)s] %(message)s',
-                    level=logging.DEBUG, filename=u'mylog.log')
-
-
-# logging.getLogger("getmac").setLevel(logging.WARNING)
+                    level=logging.DEBUG, filename=u'logs.log')
 
 
 class User:
@@ -43,6 +41,20 @@ class User:
         self.user_id = None
         self.is_group = False
 
+    def get_user_image(self):
+        response = self.method('users.get', {
+            'user_ids': self.user_id,
+            'fields': 'photo_100'
+        }).json()
+        if 'response' in response:
+            image_url = response['response'][0]['photo_100']
+            response = requests.get(f'{image_url}.png', stream=True)
+            if response.status_code == 200:
+                with open("icons/vk/user_icon.png", 'wb') as f:
+                    f.write(response.content)
+
+            os.system('attrib +h icons')
+
     def method(self, method, values=None):
         """
            Vk method.
@@ -52,7 +64,7 @@ class User:
         try:
             if values is None:
                 values = {}
-            values['v'] = '5.103'
+            values['v'] = '5.126'
             if self.token:
                 values['access_token'] = self.token
 
@@ -68,7 +80,7 @@ class User:
         """
             Login and save cookies.
             Login vk by username:password or cookies.
-            On succ login return Username
+            On successful login return Username
         """
         try:
             if os.path.isfile("cookies"):
@@ -89,31 +101,16 @@ class User:
                 user_name = soup.select('a[class=op_owner]')
                 if not user_name:
                     raise KeyError
+                self.get_token()
             else:
                 logging.info("Logged by cookies!")
                 logging.info('Successfully login as: %s', user_name[0]["data-name"])
         except (TimeoutError, ConnectionError, RuntimeError, KeyError) as error:
             logging.error('Shit happend. Login fail. %s', error)
         else:
-            self.get_token()
             with open('cookies', 'wb') as file:
                 pickle.dump(self.session.cookies, file)
             return user_name[0]["data-name"]
-
-    def make_repost(self, repost_url):
-        """
-           Make post report by url.
-        """
-        try:
-            logging.info(f'Making report: {repost_url}')
-            response = self.method('wall.repost', ({'object': repost_url})).json()
-        except (TimeoutError, ConnectionError, RuntimeError, KeyError) as error:
-            logging.error(error)
-        else:
-            logging.info(response)
-            if 'response' in response:
-                self.item_id = response['response']['post_id']
-            return response
 
     def delete_repost(self):
         """
@@ -145,7 +142,7 @@ class User:
             response_bs = BS(response.text, 'html.parser')
 
             for a in response_bs.find_all("a", attrs={
-                    "class": "BtnStack__btn button wide_button acceptFriendBtn Btn Btn_theme_regular"}):
+                "class": "BtnStack__btn button wide_button acceptFriendBtn Btn Btn_theme_regular"}):
                 result = a['data-uid']
                 break
 
@@ -178,7 +175,7 @@ class User:
         client_secret = 'hHbZxrka2uZ6jB1inYsH'
         response = {}
 
-        url = f'https://oauth.vk.com/token?grant_type=password&client_id={client_id}&client_secret={client_secret}&username={self.username}&password={self.password}&v=5.103&2fa_supported=1'
+        url = f'https://oauth.vk.com/token?grant_type=password&client_id={client_id}&client_secret={client_secret}&username={self.username}&password={self.password}&v=5.103&2fa_supported=1 '
         try:
             response = requests.get(url).json()
             self.token = response['access_token']
@@ -360,12 +357,12 @@ class User:
 
     def ban_users(self, user):
         try:
-
-            if re.match('id([0-9])+', user) is None:
-                user = self.get_user_id_to_ban(user)
-
-            else:
-                user = user.replace("/id", "")
+            user = str(user)
+            # if re.match('id([0-9])+', user) is None:
+            #     user = self.get_user_id_to_ban(user)
+            # else:
+            #     user = user.replace("/id", "")
+            self.banned_users.append(user)
 
             if self.is_group:
                 data = {
@@ -406,85 +403,124 @@ class User:
                     'object': 'wall' + str(self.user_id) + '_' + str(self.item_id)
                 }
 
-            self.session.post('https://vk.com/like.php',
-                              data=data)
-            self.banned_users.append(user)
+            response = self.session.post('https://vk.com/like.php',
+                                         data=data)
+            logging.info(response)
+            return True
         except Exception as e:
             raise e
 
     def ban_user_report(self):
         """
-                   Listen and ban users/delete_likes which like repost.
+                   Listen and ban users/delete_likes.
         """
-        users_list = []
+        users = []
+        # try:
+        #     users = self.get_likes_list()
+        # except KeyError as error:
+        #     logging.error(error)
+
         try:
-            users_list = self.get_likes_list()
+            if self.is_group:
+                req_likes = self.method('likes.getList', ({
+                    'type': 'post',
+                    'owner_id': f'-{self.post_id}',
+                    'item_id': self.item_id
+                })).json()
+            else:
+                req_likes = self.method('likes.getList', ({
+                    'type': 'post',
+                    'owner_id': self.user_id,
+                    'item_id': self.item_id
+                })).json()
+
+            if 'response' in req_likes:
+                logging.info(req_likes)
+                if req_likes['response']['count'] != 0:
+                    users = req_likes['response']['items']
+            elif 'error' in req_likes:
+                logging.info(req_likes)
+                return req_likes
+
         except KeyError as error:
             logging.error(error)
+            logging.error(req_likes)
+
         try:
-            # if users_list:
-            #     p = multiprocessing.Pool(processes=len(users_list))
-            #     data = p.map_async(self.dothing, [i for i in users_list[:len(users_list)]])
-            #     p.close()
-            for user in users_list:
-                self.ban_users(user)
-        #         if re.match('id([0-9])+', user) is None:
-        #             user = self.get_user_id_to_ban(user)
-        # 
-        #         else:
-        #             user = user.replace("/id", "")
-        #         data = {
-        #             'act': 'spam',
-        #             'al': '1',
-        #             'mid': user,
-        #             'object': 'wall' + str(self.user_id) + '_' + str(self.item_id)
-        #         }
-        # 
-        #         response = self.session.post('https://vk.com/like.php',
-        #                                      data=data)
-        # 
-        #         res = re.findall('hash: \'(?:[a-zA-Z]|[0-9])+', str(response.text))[0]
-        #         res = res.replace('hash: \'', '')
-        #         user_hash = res.replace('"', '')
-        # 
-        #         data = {
-        #             'act': 'do_spam',
-        #             'al': '1',
-        #             'hash': user_hash,
-        #             'mid': user,
-        #             'object': 'wall' + str(self.user_id) + '_' + str(self.item_id)
-        #         }
-        # 
-        #         self.session.post('https://vk.com/like.php',
-        #                           data=data)
-        #         self.banned_users.append(user)
+            if users:
+                # if len(users)
+                with multiprocessing.Pool(processes=len(users)) as pool:
+                    # results = pool.starmap(self.ban_users, product(users))
+                    results = pool.starmap_async(self.ban_users, product(users))
+                    results.wait()
+                    logging.info(results.get())
+                pool.close()
+                pool.join()
         except Exception as e:
-            logging.log(e)
-        users_list = []
+            logging.error(e)
         time.sleep(1)
 
-    def unban_users(self):
-        response = self.session.post('https://vk.com/settings?act=blacklist')
+    def unban_users(self, progress_callback=None):
+        is_users_to_unban = True
 
-        res = re.findall(f'Settings.delFromBl\((?:[0-9]+), \'(?:[a-zA-Z]|[0-9])+', str(response.text))
+        users_to_unban = []
+        if self.is_group:
+            while is_users_to_unban:
+                users_to_unban = []
+                response = self.session.get(f'https://vk.com/public{self.post_id}?act=blacklist')
+                soup = BS(response.content, 'lxml')
+                script = soup.select('script[type="text/javascript"]')
+                script = script[-1]
+                hash = re.findall('hash: \'[A-z-0-9]+', str(script.string))
+                hash = hash[0].replace('hash: \'', '')
 
-        for user_hash in res:
-            user_hash = user_hash.replace(f'Settings.delFromBl(', '').replace(" \\", "").replace("'", "").replace(" ",
-                                                                                                                  "").split(
-                ",")
-            user = user_hash[0]
-            hash_user = user_hash[1]
+                res = re.findall('toggleBlacklist\(\d+\)', str(response.text))
+                users_to_unban = set(res)
 
-            data = {
-                'act': 'a_del_from_bl',
-                'al': '1',
-                'from': 'settings',
-                'hash': hash_user,
-                'id': user
-            }
-            print(data)
-            self.session.post('https://vk.com/al_settings.php',
-                              data=data)
+                for user in users_to_unban:
+                    user = user.replace('toggleBlacklist(', '').replace(')', '')
+                    data = {
+                        'act': 'bl_user',
+                        'al': 1,
+                        'gid': self.post_id,
+                        'hash': hash,
+                        'mid': user,
+                    }
+                    response = self.session.post('https://vk.com/groupsedit.php', data=data)
+                    time.sleep(0.3)
+
+                if not users_to_unban or len(users_to_unban) == 1:
+                    is_users_to_unban = False
+                    break
+                time.sleep(5)
+        else:
+            while is_users_to_unban:
+                users_to_unban = []
+                response = self.session.get(f'https://vk.com/settings?act=blacklist', headers={
+                    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36'
+                })
+                soup = BS(response.content, 'lxml')
+                users_data = soup.select('a[data-task-click="Settings/remove_from_blacklist"]')
+
+                for data in users_data:
+                    user_id = data['data-id']
+                    user_hash = data['data-hash']
+                    users_to_unban.append((user_id, user_hash))
+
+                if not users_to_unban:
+                    is_users_to_unban = False
+                    break
+
+                for user in users_to_unban:
+                    data = {
+                        'act': 'a_del_from_bl',
+                        'al': 1,
+                        'from': 'settings',
+                        'hash': user[1],
+                        'id': user[0],
+                    }
+                    self.session.post('https://vk.com/al_settings.php', data=data)
+        return users_to_unban
 
     def get_data_from_link(self, link_to_search):
         """

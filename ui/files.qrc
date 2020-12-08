@@ -1,0 +1,26 @@
+<RCC>
+    <qresource prefix="/16x16">
+        <file>icons/24x24/cil-x-circle.png</file>
+        <file>icons/16x16/cil-home.png</file>
+        <file>icons/16x16/cil-heart.png</file>
+        <file>icons/16x16/cil-share.png</file>
+        <file>icons/16x16/cil-browser.png</file>
+        <file>icons/16x16/cil-equalizer.png</file>
+        <file>icons/16x16/cil-check-alt.png</file>
+        <file>icons/16x16/cil-arrow-bottom.png</file>
+        <file>icons/16x16/cil-terminal.png</file>
+        <file>icons/16x16/cil-window-minimize.png</file>
+        <file>icons/16x16/cil-window-maximize.png</file>
+        <file>icons/16x16/cil-x.png</file>
+        <file>icons/16x16/cil-save.png</file>
+        <file>icons/16x16/cil-size-grip.png</file>
+        <file>icons/16x16/cil-window-restore.png</file>
+    </qresource>
+    <qresource prefix="/vk">
+        <file>icons/vk/ic.ico</file>
+        <file>icons/vk/vk.png</file>
+    </qresource>
+    <qresource prefix="/24x24">
+        <file>icons/24x24/cil-menu.png</file>
+    </qresource>
+</RCC>
