@@ -6,20 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>700</width>
-    <height>540</height>
+    <width>730</width>
+    <height>560</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>700</width>
-    <height>540</height>
-   </size>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>800</width>
-    <height>600</height>
+    <width>730</width>
+    <height>560</height>
    </size>
   </property>
   <property name="font">
@@ -172,7 +166,7 @@ QCheckBox::indicator:hover {
 QCheckBox::indicator:checked {
     background: 3px solid rgb(52, 59, 72);
 	border: 3px solid rgb(52, 59, 72);	
-	background-image: url(:/16x16/icons/16x16/cil-check-alt.png);
+	background-image: url(icons/16x16/cil-check-alt.png);
 }
 
 /* RADIO BUTTON */
@@ -365,10 +359,6 @@ QPushButton:pressed {
                <property name="text">
                 <string/>
                </property>
-               <property name="icon">
-                <iconset>
-                 <normaloff>:/24x24/icons/24x24/cil-menu.png</normaloff>:/24x24/icons/24x24/cil-menu.png</iconset>
-               </property>
                <property name="iconSize">
                 <size>
                  <width>24</width>
@@ -482,7 +472,7 @@ QPushButton:pressed {
                       <string notr="true">background: transparent;
 background-position: center;
 background-repeat: no-repeat;
-image: url(:/16x16/icons/16x16/cil-terminal.png);
+image: url(icons/16x16/cil-terminal.png);
 </string>
                      </property>
                      <property name="frameShape">
@@ -521,7 +511,7 @@ text-align: left;
 </string>
                      </property>
                      <property name="text">
-                      <string>tg: @gracz</string>
+                      <string>Vk Stuff</string>
                      </property>
                     </widget>
                    </item>
@@ -605,6 +595,10 @@ text-align: left;
                       <string notr="true">QPushButton {	
 	border: none;
 	background-color: transparent;
+background-position: center;
+background-repeat: no-repeat;
+image: url(icons/16x16/cil-window-minimize.png);
+
 }
 QPushButton:hover {
 	background-color: rgb(52, 59, 72);
@@ -618,7 +612,7 @@ QPushButton:pressed {
                      </property>
                      <property name="icon">
                       <iconset>
-                       <normaloff>:/16x16/icons/16x16/cil-window-minimize.png</normaloff>:/16x16/icons/16x16/cil-window-minimize.png</iconset>
+                       <normaloff>icons/16x16/cil-window-minimize.png</normaloff>icons/16x16/cil-window-minimize.png</iconset>
                      </property>
                     </widget>
                    </item>
@@ -649,6 +643,10 @@ QPushButton:pressed {
                       <string notr="true">QPushButton {	
 	border: none;
 	background-color: transparent;
+background-position: center;
+background-repeat: no-repeat;
+image: url(icons/16x16/cil-window-maximize.png);
+
 }
 QPushButton:hover {
 	background-color: rgb(52, 59, 72);
@@ -662,7 +660,7 @@ QPushButton:pressed {
                      </property>
                      <property name="icon">
                       <iconset>
-                       <normaloff>:/16x16/icons/16x16/cil-window-maximize.png</normaloff>:/16x16/icons/16x16/cil-window-maximize.png</iconset>
+                       <normaloff>icons/16x16/cil-window-maximize.png</normaloff>icons/16x16/cil-window-maximize.png</iconset>
                      </property>
                     </widget>
                    </item>
@@ -692,7 +690,11 @@ QPushButton:pressed {
                      <property name="styleSheet">
                       <string notr="true">QPushButton {	
 	border: none;
-	background-color: transparent;
+background: transparent;
+background-position: center;
+background-repeat: no-repeat;
+image: url(icons/16x16/cil-x.png);
+
 }
 QPushButton:hover {
 	background-color: rgb(52, 59, 72);
@@ -706,7 +708,7 @@ QPushButton:pressed {
                      </property>
                      <property name="icon">
                       <iconset>
-                       <normaloff>:/16x16/icons/16x16/cil-x.png</normaloff>:/16x16/icons/16x16/cil-x.png</iconset>
+                       <normaloff>icons/16x16/cil-x.png</normaloff>icons/16x16/cil-x.png</iconset>
                      </property>
                     </widget>
                    </item>
@@ -973,7 +975,7 @@ QPushButton:pressed {
 	border: 5px solid rgb(39, 44, 54);
 	background-position: center;
 	background-repeat: no-repeat;
-	image: url(:/24x24/icons/24x24/cil-user.png);
+	image: url(icons/24x24/cil-user.png);
 }</string>
                   </property>
                   <property name="frameShape">
@@ -1050,7 +1052,7 @@ QPushButton:pressed {
                    <string notr="true">background: transparent;</string>
                   </property>
                   <property name="currentIndex">
-                   <number>4</number>
+                   <number>6</number>
                   </property>
                   <widget class="QWidget" name="vkLoginPage">
                    <layout class="QVBoxLayout" name="verticalLayout_10" stretch="0,0,0,0,0,0">
@@ -1088,7 +1090,7 @@ QPushButton:pressed {
 	background-position: center;
 	background-repeat: no-repeat;	
 	
-	image: url(:/vk/icons/vk/vk.png);
+	image: url(icons/vk/vk.png);
 
 }</string>
                       </property>
@@ -1394,7 +1396,7 @@ QPlainTextEdit:focus {
                              <widget class="QPushButton" name="SaveUrlButton">
                               <property name="minimumSize">
                                <size>
-                                <width>150</width>
+                                <width>140</width>
                                 <height>40</height>
                                </size>
                               </property>
@@ -1427,7 +1429,7 @@ QPushButton:pressed {
                               </property>
                               <property name="icon">
                                <iconset>
-                                <normaloff>:/16x16/icons/16x16/cil-save.png</normaloff>:/16x16/icons/16x16/cil-save.png</iconset>
+                                <normaloff>icons/16x16/cil-save.png</normaloff>icons/16x16/cil-save.png</iconset>
                               </property>
                               <property name="checkable">
                                <bool>false</bool>
@@ -1481,7 +1483,7 @@ padding: 10px;
 </string>
                               </property>
                               <property name="text">
-                               <string>Result</string>
+                               <string/>
                               </property>
                              </widget>
                             </item>
@@ -1540,7 +1542,7 @@ padding: 10px;
                         <number>0</number>
                        </property>
                        <property name="rightMargin">
-                        <number>0</number>
+                        <number>11</number>
                        </property>
                        <property name="bottomMargin">
                         <number>0</number>
@@ -1553,7 +1555,7 @@ padding: 10px;
                          <property name="frameShadow">
                           <enum>QFrame::Raised</enum>
                          </property>
-                         <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0">
+                         <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1,1,1">
                           <item>
                            <widget class="QLineEdit" name="LikesCount">
                             <property name="enabled">
@@ -1561,13 +1563,13 @@ padding: 10px;
                             </property>
                             <property name="minimumSize">
                              <size>
-                              <width>100</width>
-                              <height>40</height>
+                              <width>105</width>
+                              <height>39</height>
                              </size>
                             </property>
                             <property name="maximumSize">
                              <size>
-                              <width>100</width>
+                              <width>105</width>
                               <height>16777215</height>
                              </size>
                             </property>
@@ -1610,13 +1612,13 @@ QLineEdit:focus {
                            <widget class="QPushButton" name="StartLikes">
                             <property name="minimumSize">
                              <size>
-                              <width>100</width>
+                              <width>105</width>
                               <height>40</height>
                              </size>
                             </property>
                             <property name="maximumSize">
                              <size>
-                              <width>100</width>
+                              <width>105</width>
                               <height>16777215</height>
                              </size>
                             </property>
@@ -1647,13 +1649,13 @@ QPushButton:pressed {
                            <widget class="QPushButton" name="StopLikes">
                             <property name="minimumSize">
                              <size>
-                              <width>70</width>
+                              <width>105</width>
                               <height>40</height>
                              </size>
                             </property>
                             <property name="maximumSize">
                              <size>
-                              <width>100</width>
+                              <width>105</width>
                               <height>16777215</height>
                              </size>
                             </property>
@@ -1680,8 +1682,14 @@ QPushButton:pressed {
                             </property>
                            </widget>
                           </item>
-                          <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+                          <item alignment="Qt::AlignRight|Qt::AlignVCenter">
                            <widget class="QLabel" name="ResultStartLikes">
+                            <property name="minimumSize">
+                             <size>
+                              <width>140</width>
+                              <height>40</height>
+                             </size>
+                            </property>
                             <property name="maximumSize">
                              <size>
                               <width>150</width>
@@ -1697,7 +1705,11 @@ QPushButton:pressed {
                              </font>
                             </property>
                             <property name="styleSheet">
-                             <string notr="true">border-color: rgb(255, 255, 255);</string>
+                             <string notr="true">QLabel {
+	background-color: rgb(27, 29, 35);
+	border-radius: 5px;
+	border: 2px solid rgb(27, 29, 35);
+}</string>
                             </property>
                             <property name="lineWidth">
                              <number>1</number>
@@ -1712,7 +1724,7 @@ QPushButton:pressed {
                              <bool>false</bool>
                             </property>
                             <property name="alignment">
-                             <set>Qt::AlignBottom|Qt::AlignJustify</set>
+                             <set>Qt::AlignCenter</set>
                             </property>
                             <property name="margin">
                              <number>0</number>
@@ -1758,40 +1770,6 @@ QPushButton:pressed {
                        <property name="bottomMargin">
                         <number>0</number>
                        </property>
-                       <item>
-                        <widget class="QPushButton" name="Unban_users_button_2">
-                         <property name="minimumSize">
-                          <size>
-                           <width>100</width>
-                           <height>40</height>
-                          </size>
-                         </property>
-                         <property name="maximumSize">
-                          <size>
-                           <width>100</width>
-                           <height>40</height>
-                          </size>
-                         </property>
-                         <property name="styleSheet">
-                          <string notr="true">QPushButton {
-	border: 2px solid rgb(52, 59, 72);
-	border-radius: 5px;	
-	background-color: rgb(52, 59, 72);
-}
-QPushButton:hover {
-	background-color: rgb(57, 65, 80);
-	border: 2px solid rgb(61, 70, 86);
-}
-QPushButton:pressed {	
-	background-color: rgb(35, 40, 49);
-	border: 2px solid rgb(43, 50, 61);
-}</string>
-                         </property>
-                         <property name="text">
-                          <string>Clear Blacklist</string>
-                         </property>
-                        </widget>
-                       </item>
                       </layout>
                      </widget>
                     </item>
@@ -1901,7 +1879,7 @@ QPushButton:pressed {
                              <widget class="QPushButton" name="SaveUrlButton_R">
                               <property name="minimumSize">
                                <size>
-                                <width>150</width>
+                                <width>140</width>
                                 <height>40</height>
                                </size>
                               </property>
@@ -1934,7 +1912,7 @@ QPushButton:pressed {
                               </property>
                               <property name="icon">
                                <iconset>
-                                <normaloff>:/16x16/icons/16x16/cil-save.png</normaloff>:/16x16/icons/16x16/cil-save.png</iconset>
+                                <normaloff>icons/16x16/cil-save.png</normaloff>icons/16x16/cil-save.png</iconset>
                               </property>
                               <property name="checkable">
                                <bool>false</bool>
@@ -1988,7 +1966,7 @@ padding: 10px;
 </string>
                               </property>
                               <property name="text">
-                               <string>Result</string>
+                               <string/>
                               </property>
                              </widget>
                             </item>
@@ -2030,12 +2008,6 @@ padding: 10px;
                       <property name="enabled">
                        <bool>true</bool>
                       </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>600</width>
-                        <height>70</height>
-                       </size>
-                      </property>
                       <property name="frameShape">
                        <enum>QFrame::NoFrame</enum>
                       </property>
@@ -2053,7 +2025,7 @@ padding: 10px;
                         <number>0</number>
                        </property>
                        <property name="rightMargin">
-                        <number>0</number>
+                        <number>11</number>
                        </property>
                        <property name="bottomMargin">
                         <number>0</number>
@@ -2067,6 +2039,9 @@ padding: 10px;
                           <enum>QFrame::Raised</enum>
                          </property>
                          <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,0,0,0">
+                          <property name="spacing">
+                           <number>7</number>
+                          </property>
                           <item>
                            <widget class="QLineEdit" name="RepostsCount">
                             <property name="enabled">
@@ -2074,13 +2049,13 @@ padding: 10px;
                             </property>
                             <property name="minimumSize">
                              <size>
-                              <width>100</width>
+                              <width>105</width>
                               <height>40</height>
                              </size>
                             </property>
                             <property name="maximumSize">
                              <size>
-                              <width>100</width>
+                              <width>105</width>
                               <height>16777215</height>
                              </size>
                             </property>
@@ -2124,13 +2099,13 @@ QLineEdit:focus {
                            <widget class="QLineEdit" name="Reward">
                             <property name="minimumSize">
                              <size>
-                              <width>100</width>
+                              <width>105</width>
                               <height>40</height>
                              </size>
                             </property>
                             <property name="maximumSize">
                              <size>
-                              <width>100</width>
+                              <width>105</width>
                               <height>16777215</height>
                              </size>
                             </property>
@@ -2148,6 +2123,9 @@ QLineEdit:focus {
 	border: 2px solid rgb(91, 101, 124);
 }</string>
                             </property>
+                            <property name="alignment">
+                             <set>Qt::AlignCenter</set>
+                            </property>
                             <property name="placeholderText">
                              <string>Reward (min 4)</string>
                             </property>
@@ -2157,13 +2135,13 @@ QLineEdit:focus {
                            <widget class="QPushButton" name="StartLikes_R">
                             <property name="minimumSize">
                              <size>
-                              <width>70</width>
+                              <width>105</width>
                               <height>40</height>
                              </size>
                             </property>
                             <property name="maximumSize">
                              <size>
-                              <width>100</width>
+                              <width>105</width>
                               <height>16777215</height>
                              </size>
                             </property>
@@ -2194,13 +2172,13 @@ QPushButton:pressed {
                            <widget class="QPushButton" name="StopLikes_R">
                             <property name="minimumSize">
                              <size>
-                              <width>70</width>
+                              <width>105</width>
                               <height>40</height>
                              </size>
                             </property>
                             <property name="maximumSize">
                              <size>
-                              <width>100</width>
+                              <width>105</width>
                               <height>16777215</height>
                              </size>
                             </property>
@@ -2227,24 +2205,28 @@ QPushButton:pressed {
                             </property>
                            </widget>
                           </item>
-                          <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+                          <item alignment="Qt::AlignRight|Qt::AlignVCenter">
                            <widget class="QLabel" name="ResultStartLikes_R">
-                            <property name="maximumSize">
+                            <property name="minimumSize">
                              <size>
-                              <width>200</width>
-                              <height>30</height>
+                              <width>140</width>
+                              <height>40</height>
                              </size>
                             </property>
                             <property name="font">
                              <font>
                               <family>MS Shell Dlg 2</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>8</pointsize>
                               <weight>75</weight>
                               <bold>true</bold>
                              </font>
                             </property>
                             <property name="styleSheet">
-                             <string notr="true">border-color: rgb(255, 255, 255);</string>
+                             <string notr="true">QLabel {
+	background-color: rgb(27, 29, 35);
+	border-radius: 5px;
+	border: 2px solid rgb(27, 29, 35);
+}</string>
                             </property>
                             <property name="lineWidth">
                              <number>1</number>
@@ -2259,7 +2241,7 @@ QPushButton:pressed {
                              <bool>false</bool>
                             </property>
                             <property name="alignment">
-                             <set>Qt::AlignBottom|Qt::AlignJustify</set>
+                             <set>Qt::AlignCenter</set>
                             </property>
                             <property name="margin">
                              <number>0</number>
@@ -2305,22 +2287,130 @@ QPushButton:pressed {
                        <property name="bottomMargin">
                         <number>0</number>
                        </property>
+                      </layout>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                  <widget class="QWidget" name="GroupFollowersPage">
+                   <layout class="QVBoxLayout" name="verticalLayout_28" stretch="0,0,1">
+                    <property name="spacing">
+                     <number>0</number>
+                    </property>
+                    <property name="sizeConstraint">
+                     <enum>QLayout::SetNoConstraint</enum>
+                    </property>
+                    <property name="leftMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="topMargin">
+                     <number>40</number>
+                    </property>
+                    <property name="rightMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="bottomMargin">
+                     <number>0</number>
+                    </property>
+                    <item>
+                     <widget class="QFrame" name="frame_19">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>100</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>150</height>
+                       </size>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true"/>
+                      </property>
+                      <property name="frameShape">
+                       <enum>QFrame::NoFrame</enum>
+                      </property>
+                      <property name="frameShadow">
+                       <enum>QFrame::Raised</enum>
+                      </property>
+                      <layout class="QVBoxLayout" name="verticalLayout_26">
+                       <property name="topMargin">
+                        <number>9</number>
+                       </property>
+                       <property name="bottomMargin">
+                        <number>0</number>
+                       </property>
                        <item>
-                        <widget class="QPushButton" name="Unban_users_button_1">
-                         <property name="minimumSize">
-                          <size>
-                           <width>100</width>
-                           <height>40</height>
-                          </size>
-                         </property>
+                        <widget class="QFrame" name="frame_20">
                          <property name="maximumSize">
                           <size>
-                           <width>100</width>
-                           <height>40</height>
+                           <width>16777215</width>
+                           <height>100</height>
                           </size>
                          </property>
-                         <property name="styleSheet">
-                          <string notr="true">QPushButton {
+                         <property name="frameShape">
+                          <enum>QFrame::StyledPanel</enum>
+                         </property>
+                         <property name="frameShadow">
+                          <enum>QFrame::Raised</enum>
+                         </property>
+                         <layout class="QVBoxLayout" name="verticalLayout_27">
+                          <property name="spacing">
+                           <number>0</number>
+                          </property>
+                          <property name="leftMargin">
+                           <number>0</number>
+                          </property>
+                          <property name="topMargin">
+                           <number>0</number>
+                          </property>
+                          <property name="rightMargin">
+                           <number>0</number>
+                          </property>
+                          <property name="bottomMargin">
+                           <number>0</number>
+                          </property>
+                          <item>
+                           <layout class="QGridLayout" name="gridLayout_5" rowstretch="2,0" columnstretch="4,1">
+                            <property name="sizeConstraint">
+                             <enum>QLayout::SetDefaultConstraint</enum>
+                            </property>
+                            <property name="leftMargin">
+                             <number>10</number>
+                            </property>
+                            <property name="topMargin">
+                             <number>10</number>
+                            </property>
+                            <property name="rightMargin">
+                             <number>10</number>
+                            </property>
+                            <property name="bottomMargin">
+                             <number>10</number>
+                            </property>
+                            <property name="spacing">
+                             <number>10</number>
+                            </property>
+                            <item row="0" column="1">
+                             <widget class="QPushButton" name="GroupFollowersSaveUrlButton">
+                              <property name="minimumSize">
+                               <size>
+                                <width>140</width>
+                                <height>40</height>
+                               </size>
+                              </property>
+                              <property name="font">
+                               <font>
+                                <family>Segoe UI</family>
+                                <pointsize>9</pointsize>
+                               </font>
+                              </property>
+                              <property name="cursor">
+                               <cursorShape>PointingHandCursor</cursorShape>
+                              </property>
+                              <property name="styleSheet">
+                               <string notr="true">QPushButton {
 	border: 2px solid rgb(52, 59, 72);
 	border-radius: 5px;	
 	background-color: rgb(52, 59, 72);
@@ -2333,10 +2423,744 @@ QPushButton:pressed {
 	background-color: rgb(35, 40, 49);
 	border: 2px solid rgb(43, 50, 61);
 }</string>
+                              </property>
+                              <property name="text">
+                               <string>Save</string>
+                              </property>
+                              <property name="icon">
+                               <iconset>
+                                <normaloff>icons/16x16/cil-save.png</normaloff>icons/16x16/cil-save.png</iconset>
+                              </property>
+                              <property name="checkable">
+                               <bool>false</bool>
+                              </property>
+                             </widget>
+                            </item>
+                            <item row="0" column="0" alignment="Qt::AlignTop">
+                             <widget class="QLineEdit" name="GroupFollowersUrl">
+                              <property name="minimumSize">
+                               <size>
+                                <width>0</width>
+                                <height>40</height>
+                               </size>
+                              </property>
+                              <property name="styleSheet">
+                               <string notr="true">QLineEdit {
+	background-color: rgb(27, 29, 35);
+	border-radius: 5px;
+	border: 2px solid rgb(27, 29, 35);
+	padding-left: 10px;
+}
+QLineEdit:hover {
+	border: 2px solid rgb(64, 71, 88);
+}
+QLineEdit:focus {
+	border: 2px solid rgb(91, 101, 124);
+}</string>
+                              </property>
+                              <property name="placeholderText">
+                               <string>Repost URL</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item row="1" column="1">
+                             <widget class="QLabel" name="GroupFollowersResultSaveUrl">
+                              <property name="minimumSize">
+                               <size>
+                                <width>0</width>
+                                <height>30</height>
+                               </size>
+                              </property>
+                              <property name="maximumSize">
+                               <size>
+                                <width>16777215</width>
+                                <height>50</height>
+                               </size>
+                              </property>
+                              <property name="styleSheet">
+                               <string notr="true">border-radius: 2px;
+padding: 10px;
+</string>
+                              </property>
+                              <property name="text">
+                               <string/>
+                              </property>
+                             </widget>
+                            </item>
+                           </layout>
+                          </item>
+                         </layout>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QFrame" name="frame_17">
+                      <property name="enabled">
+                       <bool>true</bool>
+                      </property>
+                      <property name="frameShape">
+                       <enum>QFrame::NoFrame</enum>
+                      </property>
+                      <property name="frameShadow">
+                       <enum>QFrame::Raised</enum>
+                      </property>
+                      <layout class="QVBoxLayout" name="verticalLayout_25" stretch="0">
+                       <property name="spacing">
+                        <number>0</number>
+                       </property>
+                       <property name="leftMargin">
+                        <number>10</number>
+                       </property>
+                       <property name="topMargin">
+                        <number>0</number>
+                       </property>
+                       <property name="rightMargin">
+                        <number>11</number>
+                       </property>
+                       <property name="bottomMargin">
+                        <number>0</number>
+                       </property>
+                       <item>
+                        <widget class="QFrame" name="frame_18">
+                         <property name="frameShape">
+                          <enum>QFrame::NoFrame</enum>
                          </property>
-                         <property name="text">
-                          <string>Clear Blacklist</string>
+                         <property name="frameShadow">
+                          <enum>QFrame::Raised</enum>
                          </property>
+                         <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1,1,1,1,1">
+                          <property name="spacing">
+                           <number>7</number>
+                          </property>
+                          <item>
+                           <widget class="QLineEdit" name="GroupFollowersCount">
+                            <property name="enabled">
+                             <bool>true</bool>
+                            </property>
+                            <property name="minimumSize">
+                             <size>
+                              <width>105</width>
+                              <height>40</height>
+                             </size>
+                            </property>
+                            <property name="maximumSize">
+                             <size>
+                              <width>105</width>
+                              <height>16777215</height>
+                             </size>
+                            </property>
+                            <property name="font">
+                             <font>
+                              <family>URW Gothic L</family>
+                             </font>
+                            </property>
+                            <property name="toolTipDuration">
+                             <number>-1</number>
+                            </property>
+                            <property name="styleSheet">
+                             <string notr="true">QLineEdit {
+	background-color: rgb(27, 29, 35);
+	border-radius: 5px;
+	border: 2px solid rgb(27, 29, 35);
+	padding-left: 10px;
+}
+QLineEdit:hover {
+	border: 2px solid rgb(64, 71, 88);
+}
+QLineEdit:focus {
+	border: 2px solid rgb(91, 101, 124);
+}</string>
+                            </property>
+                            <property name="text">
+                             <string/>
+                            </property>
+                            <property name="cursorPosition">
+                             <number>0</number>
+                            </property>
+                            <property name="alignment">
+                             <set>Qt::AlignCenter</set>
+                            </property>
+                            <property name="placeholderText">
+                             <string>Followers Count</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item>
+                           <widget class="QLineEdit" name="GroupFollowersReward">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>40</height>
+                             </size>
+                            </property>
+                            <property name="maximumSize">
+                             <size>
+                              <width>105</width>
+                              <height>16777215</height>
+                             </size>
+                            </property>
+                            <property name="styleSheet">
+                             <string notr="true">QLineEdit {
+	background-color: rgb(27, 29, 35);
+	border-radius: 5px;
+	border: 2px solid rgb(27, 29, 35);
+	padding-left: 10px;
+}
+QLineEdit:hover {
+	border: 2px solid rgb(64, 71, 88);
+}
+QLineEdit:focus {
+	border: 2px solid rgb(91, 101, 124);
+}</string>
+                            </property>
+                            <property name="alignment">
+                             <set>Qt::AlignCenter</set>
+                            </property>
+                            <property name="placeholderText">
+                             <string>Reward (min 2)</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item>
+                           <widget class="QPushButton" name="GroupFollowersStart">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>40</height>
+                             </size>
+                            </property>
+                            <property name="maximumSize">
+                             <size>
+                              <width>105</width>
+                              <height>16777215</height>
+                             </size>
+                            </property>
+                            <property name="cursor">
+                             <cursorShape>PointingHandCursor</cursorShape>
+                            </property>
+                            <property name="styleSheet">
+                             <string notr="true">QPushButton {
+	border: 2px solid rgb(52, 59, 72);
+	border-radius: 5px;	
+	background-color: rgb(52, 59, 72);
+}
+QPushButton:hover {
+	background-color: rgb(57, 65, 80);
+	border: 2px solid rgb(61, 70, 86);
+}
+QPushButton:pressed {	
+	background-color: rgb(35, 40, 49);
+	border: 2px solid rgb(43, 50, 61);
+}</string>
+                            </property>
+                            <property name="text">
+                             <string>Start</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item>
+                           <widget class="QPushButton" name="GroupFollowersStop">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>40</height>
+                             </size>
+                            </property>
+                            <property name="maximumSize">
+                             <size>
+                              <width>105</width>
+                              <height>16777215</height>
+                             </size>
+                            </property>
+                            <property name="cursor">
+                             <cursorShape>PointingHandCursor</cursorShape>
+                            </property>
+                            <property name="styleSheet">
+                             <string notr="true">QPushButton {
+	border: 2px solid rgb(52, 59, 72);
+	border-radius: 5px;	
+	background-color: rgb(52, 59, 72);
+}
+QPushButton:hover {
+	background-color: rgb(57, 65, 80);
+	border: 2px solid rgb(61, 70, 86);
+}
+QPushButton:pressed {	
+	background-color: rgb(35, 40, 49);
+	border: 2px solid rgb(43, 50, 61);
+}</string>
+                            </property>
+                            <property name="text">
+                             <string>Stop</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item alignment="Qt::AlignRight|Qt::AlignVCenter">
+                           <widget class="QLabel" name="GroupFollowersResultStart">
+                            <property name="minimumSize">
+                             <size>
+                              <width>140</width>
+                              <height>40</height>
+                             </size>
+                            </property>
+                            <property name="font">
+                             <font>
+                              <family>MS Shell Dlg 2</family>
+                              <pointsize>8</pointsize>
+                              <weight>75</weight>
+                              <bold>true</bold>
+                             </font>
+                            </property>
+                            <property name="styleSheet">
+                             <string notr="true">QLabel {
+	background-color: rgb(27, 29, 35);
+	border-radius: 5px;
+	border: 2px solid rgb(27, 29, 35);
+}</string>
+                            </property>
+                            <property name="lineWidth">
+                             <number>1</number>
+                            </property>
+                            <property name="midLineWidth">
+                             <number>0</number>
+                            </property>
+                            <property name="text">
+                             <string/>
+                            </property>
+                            <property name="scaledContents">
+                             <bool>false</bool>
+                            </property>
+                            <property name="alignment">
+                             <set>Qt::AlignCenter</set>
+                            </property>
+                            <property name="margin">
+                             <number>0</number>
+                            </property>
+                            <property name="indent">
+                             <number>0</number>
+                            </property>
+                           </widget>
+                          </item>
+                         </layout>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QFrame" name="frame_21">
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>16777208</height>
+                       </size>
+                      </property>
+                      <property name="frameShape">
+                       <enum>QFrame::NoFrame</enum>
+                      </property>
+                      <property name="frameShadow">
+                       <enum>QFrame::Plain</enum>
+                      </property>
+                      <layout class="QHBoxLayout" name="horizontalLayout_8">
+                       <property name="spacing">
+                        <number>0</number>
+                       </property>
+                       <property name="leftMargin">
+                        <number>20</number>
+                       </property>
+                       <property name="topMargin">
+                        <number>0</number>
+                       </property>
+                       <property name="rightMargin">
+                        <number>0</number>
+                       </property>
+                       <property name="bottomMargin">
+                        <number>0</number>
+                       </property>
+                      </layout>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                  <widget class="QWidget" name="FriendsPage">
+                   <layout class="QVBoxLayout" name="verticalLayout_32" stretch="0,1">
+                    <property name="spacing">
+                     <number>0</number>
+                    </property>
+                    <property name="leftMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="topMargin">
+                     <number>40</number>
+                    </property>
+                    <property name="rightMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="bottomMargin">
+                     <number>0</number>
+                    </property>
+                    <item>
+                     <widget class="QFrame" name="frame_25">
+                      <property name="enabled">
+                       <bool>true</bool>
+                      </property>
+                      <property name="frameShape">
+                       <enum>QFrame::NoFrame</enum>
+                      </property>
+                      <property name="frameShadow">
+                       <enum>QFrame::Raised</enum>
+                      </property>
+                      <layout class="QVBoxLayout" name="verticalLayout_31" stretch="0">
+                       <property name="spacing">
+                        <number>0</number>
+                       </property>
+                       <property name="leftMargin">
+                        <number>10</number>
+                       </property>
+                       <property name="topMargin">
+                        <number>0</number>
+                       </property>
+                       <property name="rightMargin">
+                        <number>11</number>
+                       </property>
+                       <property name="bottomMargin">
+                        <number>0</number>
+                       </property>
+                       <item>
+                        <widget class="QFrame" name="frame_26">
+                         <property name="frameShape">
+                          <enum>QFrame::NoFrame</enum>
+                         </property>
+                         <property name="frameShadow">
+                          <enum>QFrame::Raised</enum>
+                         </property>
+                         <layout class="QHBoxLayout" name="horizontalLayout_17" stretch="0,0,0,0,0">
+                          <property name="spacing">
+                           <number>7</number>
+                          </property>
+                          <item>
+                           <widget class="QLineEdit" name="FriendsCount">
+                            <property name="enabled">
+                             <bool>true</bool>
+                            </property>
+                            <property name="minimumSize">
+                             <size>
+                              <width>120</width>
+                              <height>40</height>
+                             </size>
+                            </property>
+                            <property name="maximumSize">
+                             <size>
+                              <width>105</width>
+                              <height>16777215</height>
+                             </size>
+                            </property>
+                            <property name="font">
+                             <font>
+                              <family>MS Shell Dlg 2</family>
+                             </font>
+                            </property>
+                            <property name="toolTipDuration">
+                             <number>-1</number>
+                            </property>
+                            <property name="styleSheet">
+                             <string notr="true">QLineEdit {
+	background-color: rgb(27, 29, 35);
+	border-radius: 5px;
+	border: 2px solid rgb(27, 29, 35);
+	padding-left: 10px;
+}
+QLineEdit:hover {
+	border: 2px solid rgb(64, 71, 88);
+}
+QLineEdit:focus {
+	border: 2px solid rgb(91, 101, 124);
+}</string>
+                            </property>
+                            <property name="text">
+                             <string/>
+                            </property>
+                            <property name="cursorPosition">
+                             <number>0</number>
+                            </property>
+                            <property name="alignment">
+                             <set>Qt::AlignCenter</set>
+                            </property>
+                            <property name="placeholderText">
+                             <string>Friends Count</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item>
+                           <widget class="QLineEdit" name="RewardFriends">
+                            <property name="minimumSize">
+                             <size>
+                              <width>120</width>
+                              <height>40</height>
+                             </size>
+                            </property>
+                            <property name="maximumSize">
+                             <size>
+                              <width>105</width>
+                              <height>16777215</height>
+                             </size>
+                            </property>
+                            <property name="font">
+                             <font>
+                              <family>MS Shell Dlg 2</family>
+                             </font>
+                            </property>
+                            <property name="styleSheet">
+                             <string notr="true">QLineEdit {
+	background-color: rgb(27, 29, 35);
+	border-radius: 5px;
+	border: 2px solid rgb(27, 29, 35);
+	padding-left: 10px;
+}
+QLineEdit:hover {
+	border: 2px solid rgb(64, 71, 88);
+}
+QLineEdit:focus {
+	border: 2px solid rgb(91, 101, 124);
+}</string>
+                            </property>
+                            <property name="alignment">
+                             <set>Qt::AlignCenter</set>
+                            </property>
+                            <property name="placeholderText">
+                             <string>Reward (min 2)</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item>
+                           <widget class="QPushButton" name="StartFriends">
+                            <property name="minimumSize">
+                             <size>
+                              <width>105</width>
+                              <height>40</height>
+                             </size>
+                            </property>
+                            <property name="maximumSize">
+                             <size>
+                              <width>105</width>
+                              <height>16777215</height>
+                             </size>
+                            </property>
+                            <property name="cursor">
+                             <cursorShape>PointingHandCursor</cursorShape>
+                            </property>
+                            <property name="styleSheet">
+                             <string notr="true">QPushButton {
+	border: 2px solid rgb(52, 59, 72);
+	border-radius: 5px;	
+	background-color: rgb(52, 59, 72);
+}
+QPushButton:hover {
+	background-color: rgb(57, 65, 80);
+	border: 2px solid rgb(61, 70, 86);
+}
+QPushButton:pressed {	
+	background-color: rgb(35, 40, 49);
+	border: 2px solid rgb(43, 50, 61);
+}</string>
+                            </property>
+                            <property name="text">
+                             <string>Start</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item>
+                           <widget class="QPushButton" name="StopFriends">
+                            <property name="minimumSize">
+                             <size>
+                              <width>105</width>
+                              <height>40</height>
+                             </size>
+                            </property>
+                            <property name="maximumSize">
+                             <size>
+                              <width>105</width>
+                              <height>16777215</height>
+                             </size>
+                            </property>
+                            <property name="cursor">
+                             <cursorShape>PointingHandCursor</cursorShape>
+                            </property>
+                            <property name="styleSheet">
+                             <string notr="true">QPushButton {
+	border: 2px solid rgb(52, 59, 72);
+	border-radius: 5px;	
+	background-color: rgb(52, 59, 72);
+}
+QPushButton:hover {
+	background-color: rgb(57, 65, 80);
+	border: 2px solid rgb(61, 70, 86);
+}
+QPushButton:pressed {	
+	background-color: rgb(35, 40, 49);
+	border: 2px solid rgb(43, 50, 61);
+}</string>
+                            </property>
+                            <property name="text">
+                             <string>Stop</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item alignment="Qt::AlignLeft|Qt::AlignVCenter">
+                           <widget class="QLabel" name="ResultStartFriends">
+                            <property name="minimumSize">
+                             <size>
+                              <width>130</width>
+                              <height>40</height>
+                             </size>
+                            </property>
+                            <property name="font">
+                             <font>
+                              <family>MS Shell Dlg 2</family>
+                              <pointsize>8</pointsize>
+                              <weight>75</weight>
+                              <bold>true</bold>
+                             </font>
+                            </property>
+                            <property name="styleSheet">
+                             <string notr="true">QLabel {
+	background-color: rgb(27, 29, 35);
+	border-radius: 5px;
+	border: 2px solid rgb(27, 29, 35);
+}</string>
+                            </property>
+                            <property name="lineWidth">
+                             <number>1</number>
+                            </property>
+                            <property name="midLineWidth">
+                             <number>0</number>
+                            </property>
+                            <property name="text">
+                             <string/>
+                            </property>
+                            <property name="scaledContents">
+                             <bool>false</bool>
+                            </property>
+                            <property name="alignment">
+                             <set>Qt::AlignCenter</set>
+                            </property>
+                            <property name="margin">
+                             <number>0</number>
+                            </property>
+                            <property name="indent">
+                             <number>0</number>
+                            </property>
+                           </widget>
+                          </item>
+                         </layout>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QFrame" name="frame_24">
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>16777208</height>
+                       </size>
+                      </property>
+                      <property name="frameShape">
+                       <enum>QFrame::NoFrame</enum>
+                      </property>
+                      <property name="frameShadow">
+                       <enum>QFrame::Plain</enum>
+                      </property>
+                      <layout class="QVBoxLayout" name="verticalLayout_29">
+                       <property name="spacing">
+                        <number>0</number>
+                       </property>
+                       <property name="leftMargin">
+                        <number>20</number>
+                       </property>
+                       <property name="topMargin">
+                        <number>0</number>
+                       </property>
+                       <property name="rightMargin">
+                        <number>12</number>
+                       </property>
+                       <property name="bottomMargin">
+                        <number>300</number>
+                       </property>
+                       <item alignment="Qt::AlignLeft|Qt::AlignTop">
+                        <widget class="QComboBox" name="comboBox_2">
+                         <property name="minimumSize">
+                          <size>
+                           <width>120</width>
+                           <height>40</height>
+                          </size>
+                         </property>
+                         <property name="maximumSize">
+                          <size>
+                           <width>80</width>
+                           <height>16777215</height>
+                          </size>
+                         </property>
+                         <property name="font">
+                          <font>
+                           <family>Segoe UI</family>
+                           <pointsize>9</pointsize>
+                          </font>
+                         </property>
+                         <property name="autoFillBackground">
+                          <bool>false</bool>
+                         </property>
+                         <property name="styleSheet">
+                          <string notr="true">QComboBox{
+	background-color: rgb(27, 29, 35);
+	border-radius: 5px;
+	border: 2px solid rgb(27, 29, 35);
+	padding: 5px;
+	padding-left: 10px;
+}
+QComboBox:hover{
+	border: 2px solid rgb(64, 71, 88);
+}
+QComboBox QAbstractItemView {
+	color: rgb(85, 170, 255);	
+	background-color: rgb(27, 29, 35);
+	padding: 10px;
+	selection-background-color: rgb(39, 44, 54);
+}</string>
+                         </property>
+                         <property name="currentText">
+                          <string>Add friends</string>
+                         </property>
+                         <property name="maxCount">
+                          <number>3</number>
+                         </property>
+                         <property name="iconSize">
+                          <size>
+                           <width>16</width>
+                           <height>16</height>
+                          </size>
+                         </property>
+                         <property name="frame">
+                          <bool>true</bool>
+                         </property>
+                         <item>
+                          <property name="text">
+                           <string>Add friends</string>
+                          </property>
+                         </item>
+                         <item>
+                          <property name="text">
+                           <string>Keep as followers</string>
+                          </property>
+                         </item>
+                         <item>
+                          <property name="text">
+                           <string>Do nothing</string>
+                          </property>
+                         </item>
                         </widget>
                        </item>
                       </layout>
@@ -2550,30 +3374,131 @@ QLineEdit:focus {
                               </widget>
                              </item>
                              <item>
-                              <widget class="QPushButton" name="SaveSettingsButton">
-                               <property name="minimumSize">
-                                <size>
-                                 <width>100</width>
-                                 <height>40</height>
-                                </size>
+                              <widget class="QFrame" name="frame_clear">
+                               <property name="frameShape">
+                                <enum>QFrame::StyledPanel</enum>
                                </property>
-                               <property name="maximumSize">
-                                <size>
-                                 <width>100</width>
-                                 <height>16777215</height>
-                                </size>
+                               <property name="frameShadow">
+                                <enum>QFrame::Raised</enum>
                                </property>
-                               <property name="font">
-                                <font>
-                                 <family>Segoe UI</family>
-                                 <pointsize>9</pointsize>
-                                </font>
-                               </property>
-                               <property name="cursor">
-                                <cursorShape>PointingHandCursor</cursorShape>
-                               </property>
-                               <property name="styleSheet">
-                                <string notr="true">QPushButton {
+                               <layout class="QHBoxLayout" name="horizontalLayout_9">
+                                <property name="leftMargin">
+                                 <number>0</number>
+                                </property>
+                                <property name="topMargin">
+                                 <number>0</number>
+                                </property>
+                                <property name="rightMargin">
+                                 <number>0</number>
+                                </property>
+                                <property name="bottomMargin">
+                                 <number>0</number>
+                                </property>
+                                <item>
+                                 <widget class="QLineEdit" name="black_list_url">
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>0</width>
+                                    <height>40</height>
+                                   </size>
+                                  </property>
+                                  <property name="styleSheet">
+                                   <string notr="true">QLineEdit {
+	background-color: rgb(27, 29, 35);
+	border-radius: 5px;
+	border: 2px solid rgb(27, 29, 35);
+	padding-left: 10px;
+}
+QLineEdit:hover {
+	border: 2px solid rgb(64, 71, 88);
+}
+QLineEdit:focus {
+	border: 2px solid rgb(91, 101, 124);
+}</string>
+                                  </property>
+                                  <property name="placeholderText">
+                                   <string>Url</string>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <widget class="QComboBox" name="comboBox">
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>150</width>
+                                    <height>40</height>
+                                   </size>
+                                  </property>
+                                  <property name="font">
+                                   <font>
+                                    <family>Segoe UI</family>
+                                    <pointsize>9</pointsize>
+                                   </font>
+                                  </property>
+                                  <property name="autoFillBackground">
+                                   <bool>false</bool>
+                                  </property>
+                                  <property name="styleSheet">
+                                   <string notr="true">QComboBox{
+	background-color: rgb(27, 29, 35);
+	border-radius: 5px;
+	border: 2px solid rgb(27, 29, 35);
+	padding: 5px;
+	padding-left: 10px;
+}
+QComboBox:hover{
+	border: 2px solid rgb(64, 71, 88);
+}
+QComboBox QAbstractItemView {
+	color: rgb(85, 170, 255);	
+	background-color: rgb(27, 29, 35);
+	padding: 10px;
+	selection-background-color: rgb(39, 44, 54);
+}</string>
+                                  </property>
+                                  <property name="currentText">
+                                   <string>Main page</string>
+                                  </property>
+                                  <property name="maxCount">
+                                   <number>3</number>
+                                  </property>
+                                  <property name="iconSize">
+                                   <size>
+                                    <width>16</width>
+                                    <height>16</height>
+                                   </size>
+                                  </property>
+                                  <property name="frame">
+                                   <bool>true</bool>
+                                  </property>
+                                  <item>
+                                   <property name="text">
+                                    <string>Main page</string>
+                                   </property>
+                                  </item>
+                                  <item>
+                                   <property name="text">
+                                    <string>Public/Group</string>
+                                   </property>
+                                  </item>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <widget class="QPushButton" name="clear_black_list_button">
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>105</width>
+                                    <height>40</height>
+                                   </size>
+                                  </property>
+                                  <property name="maximumSize">
+                                   <size>
+                                    <width>105</width>
+                                    <height>40</height>
+                                   </size>
+                                  </property>
+                                  <property name="styleSheet">
+                                   <string notr="true">QPushButton {
 	border: 2px solid rgb(52, 59, 72);
 	border-radius: 5px;	
 	background-color: rgb(52, 59, 72);
@@ -2586,17 +3511,13 @@ QPushButton:pressed {
 	background-color: rgb(35, 40, 49);
 	border: 2px solid rgb(43, 50, 61);
 }</string>
-                               </property>
-                               <property name="text">
-                                <string>Save</string>
-                               </property>
-                               <property name="icon">
-                                <iconset>
-                                 <normaloff>:/16x16/icons/16x16/cil-save.png</normaloff>:/16x16/icons/16x16/cil-save.png</iconset>
-                               </property>
-                               <property name="autoRepeatDelay">
-                                <number>296</number>
-                               </property>
+                                  </property>
+                                  <property name="text">
+                                   <string>Clear Blacklist</string>
+                                  </property>
+                                 </widget>
+                                </item>
+                               </layout>
                               </widget>
                              </item>
                             </layout>
@@ -3060,7 +3981,7 @@ color: rgb(98, 103, 111);
                   </property>
                   <property name="styleSheet">
                    <string notr="true">QSizeGrip {
-	background-image: url(:/16x16/icons/16x16/cil-size-grip.png);
+	background-image: url(icons/16x16/cil-size-grip.png);
 	background-position: center;
 	background-repeat: no-reperat;
 }</string>
