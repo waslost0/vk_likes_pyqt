@@ -34,10 +34,10 @@ def get_hdsn():
 
 
 def check_hwid() -> bool:
-    return True
+    # return True
     try:
         logging.disable(logging.DEBUG)
-        #response = requests.get("https://pastebin.com/raw/GFQrRHcS")
+        # response = requests.get("https://pastebin.com/raw/GFQrRHcS")
         # for testers
         response = requests.get("https://pastebin.com/raw/eTPDZHgJ")
         user_hwid = get_hwid()
