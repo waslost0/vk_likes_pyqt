@@ -1,6 +1,7 @@
 import json
 import logging
 import re
+import time
 from random import choice
 
 import requests
@@ -12,10 +13,11 @@ class LikestWorker:
         self.group_name = None
         self.url = None
         self.session = requests.Session()
+
         self.friends_task_url = None
         self.data = None
 
-    def login_likest(self) -> bool:
+    def login_likest(self, access_token) -> bool:
         """Login likest
 
         Returns:
@@ -24,15 +26,30 @@ class LikestWorker:
         token_login = None
         logging.info('Trying to login to likest')
         try:
-            test_connection = requests.head("https://ulogin.ru/auth.php?name=vkontakte")
-            logging.info(test_connection.status_code)
-            if test_connection.status_code == 500:
-                return False
-
             page = self.session.get('https://ulogin.ru/auth.php?name=vkontakte')
+            time.sleep(0.5)
             soup = BS(page.content, 'lxml')
             token = soup.select('script')
+            hash_return_auth = None
+            hash_return_auth = re.search('"return_auth":"(.+)"},"domains', str(token)).group(1)
+            params = {
+                "redirect_uri": "https://ulogin.ru/auth.php?name=vkontakte",
+                "app_id": 3280318,
+                "scope": 4194306,
+                "is_seamless_auth": 1,
+                "access_token": access_token,
+                "hash": hash_return_auth,
 
+            }
+            response = self.session.post("https://api.vk.com/method/auth.getOauthCode?v=5.207&client_id=3280318",
+                                         params=params).json()
+            time.sleep(0.5)
+            response_code = response['response']
+
+            page = self.session.get(f'https://ulogin.ru/auth.php?name=vkontakte&code={response_code}')
+            time.sleep(0.5)
+            soup = BS(page.content, 'lxml')
+            token = soup.select('script')
             path = "token = \'(.+)\'"
             if token:
                 token_login = re.search(path, str(token)).group(1)
@@ -41,10 +58,13 @@ class LikestWorker:
                 logging.error("Can`t find <script token=...>")
 
             if token_login:
-                self.session.post(
+                response = self.session.post(
                     'https://likest.ru/user/login-ulogin/token',
                     data={'token': token_login})
-
+                soup = BS(response.content, 'lxml')
+                user_balance = soup.select_one('span[id="user-balance"]')
+                if not user_balance:
+                    return False
         except (NameError, KeyError, Exception) as error:
             logging.info('Failed login likest')
             logging.error(error)

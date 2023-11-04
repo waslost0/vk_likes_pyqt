@@ -30,6 +30,9 @@ def resource_path(relative_path):
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
+        self.is_login_likest = None
+        self.token = None
+        self.user = None
         self.threadpool = QThreadPool()
         self.runner = None
         self.ui = Ui_MainWindow()
@@ -165,14 +168,14 @@ class MainWindow(QMainWindow):
             self.ui.ResultOfLogin.setText(login_result)
 
             try:
-                self.is_login_likest = self.user.login_likest()
+                self.is_login_likest = self.user.login_likest(self.user.token)
             except Exception as e:
                 logging.error(e)
 
         elif ('token' not in self.data) and ('login' in self.data) and self.data.get('login') != '' and self.data.get('password') != '':
             self.user = VkHelper(username=self.data['login'], password=self.data['password'])
             self.user.login()
-            self.token = self.user.get_token()
+            self.token = self.user.token
             lg = Template("Ur token $token")
             logging.info(lg.substitute(self.token))
 
@@ -182,7 +185,7 @@ class MainWindow(QMainWindow):
                 token=self.token
             )
             try:
-                self.is_login_likest = self.user.login_likest()
+                self.is_login_likest = self.user.login_likest(self.user.token)
             except Exception as error:
                 logging.error(error)
             logging.info(f"Saved data {self.data_saved}")
@@ -509,8 +512,7 @@ class MainWindow(QMainWindow):
                 self.ui.ResultOfLogin.setStyleSheet("color: rgb(255, 121, 123);")
                 self.ui.ResultOfLogin.setText("Unsuccessful login")
             else:
-                self.token = self.user.get_token()
-                self.user.token = self.token
+                self.token = self.user.token
 
                 self.data = save_data_to_file(
                     login=login,
@@ -524,7 +526,6 @@ class MainWindow(QMainWindow):
                     os.remove('../../icons/vk/user_icon.png')
                 self.user.get_user_image()
                 UIFunctions.user_icon(self, 'usericon', 'icons/vk/user_icon.png', True)
-                self.ui.ResultOfLogin.setText(login_status)
 
     def check_login_result(self):
         if not self.data or not self.data['token']:
@@ -532,6 +533,6 @@ class MainWindow(QMainWindow):
             self.ui.ResultOfLogin.setText("Unsuccessful login")
         elif self.data['token']:
             if self.ui.checkBox.isChecked():
-                self.is_login_likest = self.user.login_likest()
+                self.is_login_likest = self.user.login_likest(self.user.token)
             self.ui.ResultOfLogin.setStyleSheet("color: rgb(154, 255, 152);")
             self.ui.ResultOfLogin.setText("Successful login")

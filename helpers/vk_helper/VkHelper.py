@@ -2,8 +2,7 @@ import logging
 import os
 import pickle
 import re
-import sys
-import vk_api
+from vk_api import vk_api
 import time
 from datetime import datetime
 from itertools import product
@@ -109,12 +108,15 @@ class VkHelper(LikestWorker):
                 vk_session = vk_api.VkApi(self.username, self.password)
                 vk_session.auth()
                 self.session = vk_session.http
-                response = self.session.get('https://m.vk.com/feed')
+                response = self.session.get('https://vk.com/settings')
                 soup = BS(response.content, 'lxml')
-                user_name = soup.select_one('a[class="op_owner"]')
+                user_name = soup.select_one('a[data-task-click="Settings/show_followers_migration_form_popup"]')
+                # a class="settings_right_control" data-is-account-data-not-changed="1" data-is-closed="" data-is-enough-followers="1" data-is-exist-needed-groups="1" data-is-ticket-recently-created="" data-is-verified="1
                 if not user_name:
                     raise KeyError
-                self.get_token()
+                self.token = vk_session.token.get('access_token')
+                self.user_id = vk_session.token.get('user_id')
+                self.get_user_id()
             else:
                 logging.info("Logged in by cookies!")
                 logging.info(f'Successfully login as: {str(user_name["data-name"])}')
@@ -123,7 +125,7 @@ class VkHelper(LikestWorker):
         else:
             with open('cookies', 'wb+') as file:
                 pickle.dump(self.session.cookies, file)
-            return user_name["data-name"]
+            return user_name['data-name']
 
     def delete_repost(self):
         """

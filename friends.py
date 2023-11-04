@@ -187,7 +187,7 @@ class VkWorker:
 
     def add_friends(self, user):
         response = self.session.post(f'https://m.vk.com/friends?act=accept&id={user[2]}&hash={user[1]}&from=requests',
-                          data={'_ajax': 1}).text
+                                     data={'_ajax': 1}).text
         if '"payload":[0' not in response:
             return True
 
@@ -258,9 +258,3 @@ def save_token(**kwargs):
 
     except IOError as error:
         print(error)
-
-
-if __name__ == '__main__':
-    user = VkWorker('+79278818462', 'kDsuNWLp4YX7exi4g19q')
-    user.login()
-    user.main()

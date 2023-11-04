@@ -198,7 +198,7 @@ class UIFunctions:
             main_window.ui.ResultOfLogin.setText(f"{main_window.login_result}")
 
             try:
-                main_window.is_login_likest = main_window.user.login_likest()
+                main_window.is_login_likest = main_window.user.login_likest(main_window.user.token)
             except Exception as e:
                 logging.error(e)
 
@@ -214,7 +214,7 @@ class UIFunctions:
                 token=main_window.token
             )
             try:
-                main_window.is_login_likest = main_window.user.login_likest()
+                main_window.is_login_likest = main_window.user.login_likest(main_window.user.token)
             except Exception as e:
                 logging.error(e)
             logging.info(f"Saved data {main_window.data_saved}")
