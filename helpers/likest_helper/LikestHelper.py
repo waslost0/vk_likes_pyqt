@@ -30,32 +30,42 @@ class LikestWorker:
             time.sleep(0.5)
             soup = BS(page.content, 'lxml')
             token = soup.select('script')
-            hash_return_auth = None
-            hash_return_auth = re.search('"return_auth":"(.+)"},"domains', str(token)).group(1)
-            params = {
-                "redirect_uri": "https://ulogin.ru/auth.php?name=vkontakte",
-                "app_id": 3280318,
-                "scope": 4194306,
-                "is_seamless_auth": 1,
-                "access_token": access_token,
-                "hash": hash_return_auth,
+            hash_return_auth = re.search('"return_auth":"(.+)"},"domains', str(token))
+            if hash_return_auth:
+                hash_return_auth = hash_return_auth.group(1)
+                params = {
+                    "redirect_uri": "https://ulogin.ru/auth.php?name=vkontakte",
+                    "app_id": 3280318,
+                    "scope": 4194306,
+                    "is_seamless_auth": 1,
+                    "access_token": access_token,
+                    "hash": hash_return_auth,
 
-            }
-            response = self.session.post("https://api.vk.com/method/auth.getOauthCode?v=5.207&client_id=3280318",
-                                         params=params).json()
-            time.sleep(0.5)
-            response_code = response['response']
-
-            page = self.session.get(f'https://ulogin.ru/auth.php?name=vkontakte&code={response_code}')
-            time.sleep(0.5)
-            soup = BS(page.content, 'lxml')
-            token = soup.select('script')
-            path = "token = \'(.+)\'"
-            if token:
-                token_login = re.search(path, str(token)).group(1)
-                logging.info(f'Likest token: {token_login}')
+                }
+                response = self.session.post("https://api.vk.com/method/auth.getOauthCode?v=5.207&client_id=3280318",
+                                             params=params).json()
+                time.sleep(0.5)
+                response_code = response['response']
+                page = self.session.get(f'https://ulogin.ru/auth.php?name=vkontakte&code={response_code}')
+                time.sleep(0.5)
+                soup = BS(page.content, 'lxml')
+                token = soup.select('script')
+                path = "token = \'(.+)\'"
+                if token:
+                    token_login = re.search(path, str(token)).group(1)
+                    logging.info(f'Likest token: {token_login}')
+                else:
+                    logging.error("Can`t find <script token=...>")
             else:
-                logging.error("Can`t find <script token=...>")
+                time.sleep(0.5)
+                soup = BS(page.content, 'lxml')
+                token = soup.select('script')
+                path = "token = \'(.+)\'"
+                if token:
+                    token_login = re.search(path, str(token)).group(1)
+                    logging.info(f'Likest token: {token_login}')
+                else:
+                    logging.error("Can`t find <script token=...>")
 
             if token_login:
                 response = self.session.post(
@@ -321,6 +331,8 @@ class LikestWorker:
 
             self.session.head('https://likest.ru/groups/add')
             response = self.session.post('https://likest.ru/system/ajax', data=payload)
+            if "error" in response.text:
+                return False
         except (ConnectionError, TimeoutError, ValueError, RuntimeError) as error:
             logging.error(error)
         else:
@@ -610,6 +622,6 @@ class LikestWorker:
         elif task_type == 'repost':
             self.add_task_reposts(url, count, reward)
         elif task_type == 'followers':
-            self.add_task_group_followers(url, count, reward)
+            return self.add_task_group_followers(url, count, reward)
         elif task_type == 'friends':
             self.add_task_friends(count, reward)

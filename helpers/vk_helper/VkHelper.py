@@ -41,6 +41,7 @@ class VkHelper(LikestWorker):
         self.token = None
         self.list_2d = [[] for _ in range(0, 3)]
         self.session = requests.Session()
+        self.session.cookies.set('remixmdevice', '3440/1440/1/!!-!!!!!!!!-/841', path='/', domain='.vk.com')
         self.item_id = None
         self.user_id = None
         self.is_group = False
@@ -398,6 +399,14 @@ class VkHelper(LikestWorker):
     def get_group_users_hash(self):
         hashes = []
         try:
+            #            response = self.session.get(f'https://vk.com/{self.group_name}?act=users')
+            # soup = BS(response.text, 'lxml')
+            # users_hash = soup.select(f'a[class="group_u_action"]')
+            # path = "\[this,\s\d+,\s\'(.+)\'"
+            # for hash in users_hash:
+            #     real_hash = re.search(path, str(hash)).group(1)
+            #     hashes.append(real_hash)
+
             response = self.session.get(f'https://m.vk.com/{self.group_name}?act=users')
             soup = BS(response.text, 'lxml')
             users_hash = soup.select(f'div[class="si_links"]>a:nth-of-type(2)')

@@ -369,7 +369,6 @@ class MainWindow(QMainWindow):
             save_data_to_file(url_tolike=self.url, post_id=self.user.item_id)
 
             if self.is_login_likest:
-
                 if self.ui.LikestCheckBox.isChecked() and self.ui.stackedWidget.currentIndex() == 2:
                     count = self.ui.LikesCount.text()
                     self.user.add_likest_task(task_type='like', count=count, url=self.url)
@@ -382,7 +381,9 @@ class MainWindow(QMainWindow):
                 elif self.ui.stackedWidget.currentIndex() == 4:
                     count = self.ui.GroupFollowersCount.text()
                     reward = self.ui.GroupFollowersReward.text()
-                    self.user.add_likest_task(task_type='followers', count=count, reward=reward, url=self.url)
+                    result = self.user.add_likest_task(task_type='followers', count=count, reward=reward, url=self.url)
+                    if result is False:
+                        return
                     self.user.time = datetime.now()
                 elif self.ui.stackedWidget.currentIndex() == 5:
                     count = self.ui.FriendsCount.text()
