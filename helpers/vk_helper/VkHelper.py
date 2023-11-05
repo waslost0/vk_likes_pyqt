@@ -724,7 +724,12 @@ class VkHelper(LikestWorker):
             '_tstat': '',
             '_ref': self.group_name,
         }
-        self.session.post(f'https://m.vk.com/{self.group_name}{url}', data=data)
+        time.sleep(1)
+        response = self.session.post(f'https://m.vk.com/{self.group_name}{url}', data=data)
+        logging.info(response)
+        if "Действие временно невозможно" in response.text:
+            time.sleep(10)
+            return False
         return True
 
     def clear_black_list_main_page(self, url=None, progress_callback=None):
@@ -771,13 +776,15 @@ class VkHelper(LikestWorker):
                 results = pool.starmap_async(self.unban_user_group, product(users_to_unban))
                 results.wait()
                 logging.info(results.get())
+                if False in results.get():
+                    time.sleep(20)
                 pool.close()
                 pool.terminate()
 
             if not users_to_unban or len(users_to_unban) == 1:
                 is_users_to_unban = False
                 break
-            time.sleep(0.5)
+            time.sleep(2)
 
     def get_data_from_link(self, link_to_search, is_likes_reposts):
         """
