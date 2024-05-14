@@ -41,14 +41,15 @@ class VkHelper(LikestWorker):
         self.token = None
         self.list_2d = [[] for _ in range(0, 3)]
         self.session = requests.Session()
-        self.session.cookies.set('remixmdevice', '3440/1440/1/!!-!!!!!!!!-/841', path='/', domain='.vk.com')
         self.item_id = None
         self.user_id = None
         self.is_group = False
         self.url = None
         self.group_id = None
+        self.session.headers.update({'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'})
         self.users_hash = None
         self.banned_counter = 0
+        self.session.cookies.set('remixmdevice', '3440/1440/1/!!-!!!!!!!!-/1214', path='/', domain='.vk.com')
 
     def get_user_image(self):
         response = self.method('users.get', {
@@ -406,7 +407,7 @@ class VkHelper(LikestWorker):
             # for hash in users_hash:
             #     real_hash = re.search(path, str(hash)).group(1)
             #     hashes.append(real_hash)
-
+            self.session.cookies.set('remixmdevice', '3440/1440/1/!!-!!!!!!!!-/1214', path='/', domain='.vk.com')
             response = self.session.get(f'https://m.vk.com/{self.group_name}?act=users')
             soup = BS(response.text, 'lxml')
             users_hash = soup.select(f'div[class="si_links"]>a:nth-of-type(2)')
@@ -503,7 +504,7 @@ class VkHelper(LikestWorker):
             soup = BS(response.text, 'lxml')
             if soup.select_one('div[class="service_msg service_msg_error"]'):
                 response = self.session.get(f'https://vk.com/id{user}', headers={
-                    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4041.0 Safari/537.36'})
+                    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'})
                 soup = BS(response.text, 'lxml')
                 if soup.select_one('h5[class="profile_blocked page_block"]'):
                     return True
