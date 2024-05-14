@@ -7,6 +7,10 @@ from random import choice
 import requests
 from bs4 import BeautifulSoup as BS
 
+from vk_api.vk_api.utils import search_re
+
+RE_AUTH_TOKEN_URL = re.compile(r'window\.init = ({.*?});')
+
 
 class LikestWorker:
     def __init__(self):
@@ -26,29 +30,50 @@ class LikestWorker:
         token_login = None
         logging.info('Trying to login to likest')
         try:
-            page = self.session.get('https://ulogin.ru/auth.php?name=vkontakte')
+            response = self.session.get('https://ulogin.ru/auth.php?name=vkontakte')
             time.sleep(0.5)
-            soup = BS(page.content, 'lxml')
-            token = soup.select('script')
-            hash_return_auth = re.search('"return_auth":"(.+)"},"domains', str(token))
-            if hash_return_auth:
-                hash_return_auth = hash_return_auth.group(1)
-                params = {
-                    "redirect_uri": "https://ulogin.ru/auth.php?name=vkontakte",
-                    "app_id": 3280318,
-                    "scope": 4194306,
-                    "is_seamless_auth": 1,
-                    "access_token": access_token,
-                    "hash": hash_return_auth,
+            auth_json = json.loads(search_re(RE_AUTH_TOKEN_URL, response.text))
+            return_auth_hash = auth_json['data']['hash']['return_auth']
 
-                }
-                response = self.session.post("https://api.vk.com/method/auth.getOauthCode?v=5.207&client_id=3280318",
-                                             params=params).json()
-                time.sleep(0.5)
+            if return_auth_hash:
+                response = self.session.get(response.url)
+                auth_json = json.loads(search_re(RE_AUTH_TOKEN_URL, response.text))
+                return_auth_hash = auth_json['data']['hash']['return_auth']
+                response = self.session.post(
+                    'https://login.vk.com/?act=connect_internal',
+                    {
+                        'uuid': '',
+                        'service_group': '',
+                        'oauth_version': '',
+                        'return_auth_hash': return_auth_hash,
+                        'version': 1,
+                        'app_id': 3280318,
+                    },
+                    headers={'Origin': 'https://id.vk.com'}
+                )
+                connect_data = response.json()
+                auth_user_hash = connect_data['data']['auth_user_hash']
+                access_token = connect_data['data']['access_token']
+
+                response = self.session.post(
+                    "https://api.vk.com/method/auth.getOauthCode?v=5.207&client_id=3280318",
+                    {
+                        "redirect_uri": "https://ulogin.ru/auth.php?name=vkontakte",
+                        "app_id": 3280318,
+                        "hash": return_auth_hash,
+                        "scope": 4194306,
+                        "is_seamless_auth": 1,
+                        "access_token": access_token,
+                        'auth_user_hash': auth_user_hash,
+                    },
+                    headers={
+                        'Origin': 'https://id.vk.com',
+                    }
+                ).json()
+                logging.info(response)
                 response_code = response['response']
-                page = self.session.get(f'https://ulogin.ru/auth.php?name=vkontakte&code={response_code}')
-                time.sleep(0.5)
-                soup = BS(page.content, 'lxml')
+                response = self.session.get(f'https://ulogin.ru/auth.php?name=vkontakte&code={response_code}')
+                soup = BS(response.content, 'lxml')
                 token = soup.select('script')
                 path = "token = \'(.+)\'"
                 if token:
@@ -57,8 +82,7 @@ class LikestWorker:
                 else:
                     logging.error("Can`t find <script token=...>")
             else:
-                time.sleep(0.5)
-                soup = BS(page.content, 'lxml')
+                soup = BS(response.content, 'lxml')
                 token = soup.select('script')
                 path = "token = \'(.+)\'"
                 if token:

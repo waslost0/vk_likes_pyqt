@@ -168,18 +168,18 @@ class VkApi(object):
         if not self.login:
             raise LoginRequired('Login is required to auth')
 
-        self.logger.info('Auth with login: {}'.format(self.login))
+        self.logger.info(f'Auth with login: {self.login}')
 
         set_cookies_from_list(
             self.http.cookies,
             self.storage.setdefault('cookies', [])
         )
 
-        self.token = self.storage.setdefault(
-            'token', {}
-        ).setdefault(
-            'app' + str(self.app_id), {}
-        ).get('scope_' + str(self.scope))
+        self.token = (
+            self.storage.setdefault('token', {})
+            .setdefault(f'app{str(self.app_id)}', {})
+            .get(f'scope_{str(self.scope)}')
+        )
 
         if token_only:
             self._auth_token(reauth=reauth)
@@ -198,22 +198,14 @@ class VkApi(object):
             return
 
         if not self.check_sid():
-            self.logger.info(
-                'remixsid from config is not valid: {}'.format(
-                    self._sid
-                )
-            )
+            self.logger.info(f'remixsid from config is not valid: {self._sid}')
 
             self._vk_login()
         else:
             self._pass_security_check()
 
         if not self._check_token():
-            self.logger.info(
-                'access_token from config is not valid: {}'.format(
-                    self.token
-                )
-            )
+            self.logger.info(f'access_token from config is not valid: {self.token}')
 
             self._api_login()
         else:
@@ -288,12 +280,7 @@ class VkApi(object):
         }
 
         if captcha_sid and captcha_key:
-            self.logger.info(
-                'Using captcha code: {}: {}'.format(
-                    captcha_sid,
-                    captcha_key
-                )
-            )
+            self.logger.info(f'Using captcha code: {captcha_sid}: {captcha_key}')
             values['captcha_sid'] = captcha_sid
             values['captcha_key'] = captcha_key
 
@@ -329,14 +316,13 @@ class VkApi(object):
 
             self._pass_twofactor(response)
 
-        if self._sid:
-            self.logger.info('Got remixsid')
-
-            self.storage.cookies = cookies_to_list(self.http.cookies)
-            self.storage.save()
-        else:
+        if not self._sid:
             raise AuthError(get_unknown_exc_str('AUTH; no sid'))
 
+        self.logger.info('Got remixsid')
+
+        self.storage.cookies = cookies_to_list(self.http.cookies)
+        self.storage.save()
         response = self._pass_security_check(response)
 
         if 'act=blocked' in response.url:
@@ -362,12 +348,7 @@ class VkApi(object):
             'remember': int(remember_device),
         }
         if captcha_sid and captcha_key:
-            self.logger.info(
-                'Using captcha code: {}: {}'.format(
-                    captcha_sid,
-                    captcha_key
-                )
-            )
+            self.logger.info(f'Using captcha code: {captcha_sid}: {captcha_key}')
             values['captcha_sid'] = captcha_sid
             values['captcha_key'] = captcha_key
 
@@ -507,10 +488,12 @@ class VkApi(object):
                 if connect_data['type'] != 'okay':
                     raise AuthError('Unknown API auth error')
                 auth_token = connect_data['data']['access_token']
+                auth_user_hash = connect_data['data']['auth_user_hash']
                 response = self.http.post(
                     'https://api.vk.com/method/auth.getOauthToken',
                     {
                         'hash': return_auth_hash,
+                        'auth_user_hash': auth_user_hash,
                         'app_id': self.app_id,
                         'client_id': self.app_id,
                         'scope': self.scope,
@@ -522,11 +505,9 @@ class VkApi(object):
 
                 self.token = response.json()['response']
 
-                self.storage.setdefault(
-                    'token', {}
-                ).setdefault(
-                    'app' + str(self.app_id), {}
-                )['scope_' + str(self.scope)] = self.token
+                self.storage.setdefault('token', {}).setdefault(
+                    f'app{str(self.app_id)}', {}
+                )[f'scope_{str(self.scope)}'] = self.token
 
                 self.storage.save()
 
@@ -555,11 +536,9 @@ class VkApi(object):
 
             self.token = token
 
-            self.storage.setdefault(
-                'token', {}
-            ).setdefault(
-                'app' + str(self.app_id), {}
-            )['scope_' + str(self.scope)] = token
+            self.storage.setdefault('token', {}).setdefault(
+                f'app{str(self.app_id)}', {}
+            )[f'scope_{str(self.scope)}'] = token
 
             self.storage.save()
 
@@ -574,7 +553,7 @@ class VkApi(object):
             if error_text and '@vk.com' in error_text:
                 error_text = error_data.get('error')
 
-            raise AuthError('API auth error: {}'.format(error_text))
+            raise AuthError(f'API auth error: {error_text}')
 
         else:
             raise AuthError('Unknown API auth error')
@@ -722,9 +701,9 @@ class VkApi(object):
                 time.sleep(delay)
 
             response = self.http.post(
-                'https://api.vk.com/method/' + method,
+                f'https://api.vk.com/method/{method}',
                 values,
-                headers={'Cookie': ''}
+                headers={'Cookie': ''},
             )
             self.last_request = time.time()
 
@@ -789,8 +768,7 @@ class VkApiMethod(object):
             method = m[0] + ''.join(i.title() for i in m[1:])
 
         return VkApiMethod(
-            self._vk,
-            (self._method + '.' if self._method else '') + method
+            self._vk, (f'{self._method}.' if self._method else '') + method
         )
 
     def __call__(self, **kwargs):
